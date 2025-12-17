@@ -2,8 +2,8 @@ name: Yad2 Apartment Scraper
 
 on:
   schedule:
-    # Run every 2 minutes (GitHub Actions minimum is 5 minutes, but we can use 2)
-    - cron: "*/2 * * * *"
+    # Run every 5 minutes (GitHub minimum supported interval)
+    - cron: "*/5 * * * *"
 
   # Allow manual trigger from GitHub UI
   workflow_dispatch:

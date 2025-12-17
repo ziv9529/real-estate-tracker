@@ -1,4 +1,4 @@
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientConnectorError
 from urllib.parse import urlencode
 import asyncio
 import json
@@ -16,6 +16,10 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 logger = logging.getLogger(__name__)
+
+# Constants for error handling
+MAX_RETRIES = 3
+RETRY_DELAY = 2  # seconds
 
 load_dotenv()
 
@@ -160,44 +164,78 @@ def is_possible_duplicate(new_item_data):
     return None, None
 
 async def fetch_listings(client: ClientSession, page: int = 1):
-    """Fetch listings from the API for a specific page"""
-    try:
-        params = {**API_PARAMS, "page": str(page)}
-        
-        # Add neighborhood IDs to API call if specified
-        if WANTED_NEIGHBORHOOD_IDS:
-            params["multiNeighborhood"] = ",".join(map(str, WANTED_NEIGHBORHOOD_IDS))
-            logger.debug(f"Using neighborhood filter: {WANTED_NEIGHBORHOOD_IDS}")
-        
-        url = f"{API_BASE_URL}?{urlencode(params)}"
-        
-        logger.debug(f"Fetching page {page}: {url}")
-        response = await client.get(url, timeout=20)
-        logger.debug(f"Page {page} response status: {response.status}")
-        
-        data = await response.json()
-        
-        # Get all results from all categories (private, agency, etc.)
-        data_container = data.get("data", {})
-        logger.debug(f"Page {page}: Available data keys: {list(data_container.keys())}")
-        
-        results = []
-        
-        # Try to get results from all possible keys (not just "markers")
-        for key, value in data_container.items():
-            if isinstance(value, list):
-                logger.debug(f"Page {page}: Found {len(value)} listings in '{key}'")
-                results.extend(value)
-        
-        logger.info(f"Page {page}: Retrieved {len(results)} listings total (from all categories)")
-        
-        if len(results) == 0:
-            logger.warning(f"Page {page}: No listings returned! Response structure: {json.dumps(data, indent=2)[:500]}")
-        
-        return results
-    except Exception as e:
-        logger.error(f"Error fetching page {page}: {e}", exc_info=True)
-        return []
+    """Fetch listings from the API for a specific page with retry logic"""
+    
+    # Headers to avoid bot detection
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+    
+    for attempt in range(MAX_RETRIES):
+        try:
+            params = {**API_PARAMS, "page": str(page)}
+            
+            # Add neighborhood IDs to API call if specified
+            if WANTED_NEIGHBORHOOD_IDS:
+                params["multiNeighborhood"] = ",".join(map(str, WANTED_NEIGHBORHOOD_IDS))
+                logger.debug(f"Using neighborhood filter: {WANTED_NEIGHBORHOOD_IDS}")
+            
+            url = f"{API_BASE_URL}?{urlencode(params)}"
+            
+            logger.debug(f"Fetching page {page} (attempt {attempt + 1}/{MAX_RETRIES}): {url}")
+            response = await client.get(url, timeout=20, headers=headers)
+            logger.debug(f"Page {page} response status: {response.status}")
+            
+            # Check if we got HTML instead of JSON (bot detection)
+            content_type = response.headers.get('content-type', '')
+            if 'text/html' in content_type:
+                logger.warning(f"Page {page} attempt {attempt + 1}: Got HTML response (bot detection). Retrying...")
+                if attempt < MAX_RETRIES - 1:
+                    await asyncio.sleep(RETRY_DELAY * (attempt + 1))  # Exponential backoff
+                    continue
+                else:
+                    logger.error(f"Page {page}: Failed after {MAX_RETRIES} attempts - API is blocking requests")
+                    return []
+            
+            data = await response.json()
+            
+            # Get all results from all categories (private, agency, etc.)
+            data_container = data.get("data", {})
+            logger.debug(f"Page {page}: Available data keys: {list(data_container.keys())}")
+            
+            results = []
+            
+            # Try to get results from all possible keys (not just "markers")
+            for key, value in data_container.items():
+                if isinstance(value, list):
+                    logger.debug(f"Page {page}: Found {len(value)} listings in '{key}'")
+                    results.extend(value)
+            
+            logger.info(f"Page {page}: Retrieved {len(results)} listings total (from all categories)")
+            
+            if len(results) == 0:
+                logger.warning(f"Page {page}: No listings returned")
+            
+            return results
+            
+        except asyncio.TimeoutError:
+            logger.warning(f"Page {page} attempt {attempt + 1}: Timeout. Retrying...")
+            if attempt < MAX_RETRIES - 1:
+                await asyncio.sleep(RETRY_DELAY * (attempt + 1))
+                continue
+            else:
+                logger.error(f"Page {page}: Timeout after {MAX_RETRIES} attempts")
+                return []
+        except Exception as e:
+            logger.warning(f"Page {page} attempt {attempt + 1}: {type(e).__name__}: {e}")
+            if attempt < MAX_RETRIES - 1:
+                await asyncio.sleep(RETRY_DELAY * (attempt + 1))
+                continue
+            else:
+                logger.error(f"Page {page}: Failed after {MAX_RETRIES} attempts")
+                return []
+    
+    return []
 
 async def check_yad2_listings(max_pages: int = 1):
     """Check for new listings and price changes"""
