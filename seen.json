@@ -78,5 +78,15 @@
     "sqm": 120,
     "phone": "055-2129795",
     "token": "8jog0kcc"
+  },
+  "https://www.yad2.co.il/item/sw7cyuw7": {
+    "price": 2290000,
+    "rooms": 3,
+    "street": "אורנה פורת",
+    "neighborhood": "הרקפות",
+    "floor": 5,
+    "sqm": 75,
+    "phone": "055-4361115",
+    "token": "sw7cyuw7"
   }
 }
