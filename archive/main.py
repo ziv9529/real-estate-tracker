@@ -3,24 +3,43 @@ import datetime
 import time
 import json
 import os
-import smtplib
-from email.message import EmailMessage
+
 from dotenv import load_dotenv
+
 load_dotenv()
 
+# === Telegram Credentials ===
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-# === Email Credentials ===
-SENDER_EMAIL = os.getenv("SENDER_EMAIL")
-SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
-RECEIVER_EMAILS = os.getenv("RECEIVER_EMAILS").split(",")
+if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+    raise RuntimeError("Missing TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID in .env")
+
+TELEGRAM_SEND_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
 
 # === API URLs ===
-API_URL = "https://gw.yad2.co.il/realestate-feed/rent/map?city=1200&area=8&topArea=2&minRooms=3&maxRooms=3.5"
+API_URL = "https://gw.yad2.co.il/realestate-feed/forsale/feed?city=8300&property=apartment&maxPrice=2200000&minRooms=3&maxRooms=3.5&minSquaremeter=70&minFloor=2&priceOnly=1&sort=1&page=1"
 CUSTOMER_URL = "https://gw.yad2.co.il/realestate-item/{}/customer"
 
 # === Seen Ads ===
 SEEN_FILE = "seen.json"
 seen = {}
+
+def send_telegram(text: str):
+    """
+    Sends a plain-text message to Telegram via Bot API sendMessage.
+    Docs: https://core.telegram.org/bots/api#sendmessage
+    """
+    try:
+        payload = {
+            "chat_id": TELEGRAM_CHAT_ID,
+            "text": text,
+            "disable_web_page_preview": True,
+        }
+        r = requests.post(TELEGRAM_SEND_URL, json=payload, timeout=20)
+        r.raise_for_status()
+    except Exception as e:
+        print("❌ שגיאה בשליחת טלגרם:", e)
 
 # === Load or initialize seen listings with full data ===
 def load_or_initialize_seen():
@@ -31,7 +50,7 @@ def load_or_initialize_seen():
         print(f"📂 נטענו {len(seen)} מודעות מ-{SEEN_FILE}")
     else:
         print("🛑 ריצה ראשונה: שומר את כל המודעות הקיימות בלי לשלוח...")
-        res = requests.get(API_URL)
+        res = requests.get(API_URL, timeout=20)
         data = res.json()
         listings = data.get("data", {}).get("markers", [])
         for item in listings:
@@ -42,22 +61,19 @@ def load_or_initialize_seen():
         save_seen()
         print(f"💾 נשמרו {len(seen)} מודעות קיימות.")
 
-# === Save seen to file ===
 def save_seen():
     with open(SEEN_FILE, "w", encoding="utf-8") as f:
         json.dump(seen, f, indent=2, ensure_ascii=False)
 
-# === Get contact phone from separate API ===
 def get_contact_phone(token):
     try:
-        res = requests.get(CUSTOMER_URL.format(token))
+        res = requests.get(CUSTOMER_URL.format(token), timeout=20)
         data = res.json()
         return data.get("data", {}).get("brokerPhone") or data.get("data", {}).get("phone")
     except Exception as e:
         print("⚠️ שגיאה בשליפת טלפון:", e)
         return None
 
-# === Extract listing data ===
 def extract_listing_data(item):
     token = item.get("token")
     return {
@@ -65,43 +81,27 @@ def extract_listing_data(item):
         "rooms": item.get("additionalDetails", {}).get("roomsCount"),
         "street": item.get("address", {}).get("street", {}).get("text", "לא ידוע"),
         "sqm": item.get("additionalDetails", {}).get("squareMeter", 0),
-        "phone": get_contact_phone(token)
+        "phone": get_contact_phone(token),
     }
 
-# === Check for similar listing with different price and same phone ===
 def is_possible_duplicate(new_item_data):
     for url, old in seen.items():
         if (
-            old.get("street") == new_item_data.get("street") and
-            old.get("rooms") == new_item_data.get("rooms") and
-            abs(old.get("sqm", 0) - new_item_data.get("sqm", 0)) <= 3 and
-            old.get("price") != new_item_data.get("price") and
-            old.get("phone") and new_item_data.get("phone") and
-            old.get("phone") == new_item_data.get("phone")
+            old.get("street") == new_item_data.get("street")
+            and old.get("rooms") == new_item_data.get("rooms")
+            and abs(old.get("sqm", 0) - new_item_data.get("sqm", 0)) <= 3
+            and old.get("price") != new_item_data.get("price")
+            and old.get("phone")
+            and new_item_data.get("phone")
+            and old.get("phone") == new_item_data.get("phone")
         ):
             return url, old
     return None, None
 
-# === Email sender ===
-def send_email(subject, body):
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = SENDER_EMAIL
-    msg["To"] = ", ".join(RECEIVER_EMAILS)
-    msg.set_content(body)
-    try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-            smtp.login(SENDER_EMAIL, SENDER_PASSWORD)
-            smtp.send_message(msg)
-            print("✅ מייל נשלח לנמענים:", RECEIVER_EMAILS)
-    except Exception as e:
-        print("❌ שגיאה בשליחת מייל:", e)
-
-# === Main check function ===
 def check_yad2_json():
     try:
         print(f"[{datetime.datetime.now()}] 📡 בודק מודעות חדשות או שינויי מחיר...")
-        res = requests.get(API_URL)
+        res = requests.get(API_URL, timeout=20)
         data = res.json()
         listings = data.get("data", {}).get("markers", [])
         changes = 0
@@ -113,6 +113,7 @@ def check_yad2_json():
 
             url = f"https://www.yad2.co.il/item/{token}"
             new_data = extract_listing_data(item)
+
             price = new_data["price"]
             rooms = new_data["rooms"]
             street = new_data["street"]
@@ -124,13 +125,14 @@ def check_yad2_json():
                     old_price = seen[url]["price"]
                     seen[url] = new_data
                     save_seen()
+
                     message = (
                         f"💸 שינוי במחיר מודעה קיימת:\n"
                         f"רחוב: {street}\nחדרים: {rooms}\n"
                         f"מחיר קודם: {old_price} ₪\n"
                         f"מחיר חדש: {price} ₪\n{url}"
                     )
-                    send_email("💸 עדכון מחיר ביד2", message)
+                    send_telegram(message)
                     changes += 1
             else:
                 old_url, old_data = is_possible_duplicate(new_data)
@@ -144,10 +146,13 @@ def check_yad2_json():
                         f"קישור חדש: {url}\n"
                         f"קישור קודם: {old_url}"
                     )
-                    send_email("🔁 דירה שפורסמה מחדש ביד2", message)
+                    send_telegram(message)
                 else:
-                    message = f"🔔 דירה חדשה ביד2!\nרחוב: {street}\nחדרים: {rooms}\nמחיר: {price} ₪\nטלפון: {phone}\n{url}"
-                    send_email("🔔 דירה חדשה ביד2", message)
+                    message = (
+                        f"🔔 דירה חדשה ביד2!\nרחוב: {street}\nחדרים: {rooms}\n"
+                        f"מחיר: {price} ₪\nטלפון: {phone}\n{url}"
+                    )
+                    send_telegram(message)
 
                 seen[url] = new_data
                 save_seen()

@@ -1,17 +1,27 @@
 #Secrets and passwords
 .env
+.env.local
 
-# קובץ נתוני מודעות שנשמרו מקומית
-seen.json
+# Python virtual environments
+venv/
+.venv/
+env/
+.env/
 
-# קבצי קומפילציה של פייתון
+# Python compilation files
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
 
-# סביבה וירטואלית
-venv/
-.env/
-env/
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# קבצים זמניים של מערכת ההפעלה
+# Temporary files
+tmp.txt
 .DS_Store
