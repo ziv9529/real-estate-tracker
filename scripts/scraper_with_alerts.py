@@ -166,9 +166,18 @@ def is_possible_duplicate(new_item_data):
 async def fetch_listings(client: ClientSession, page: int = 1):
     """Fetch listings from the API for a specific page with retry logic"""
     
-    # Headers to avoid bot detection
+    # Enhanced headers to mimic real browser and avoid bot detection
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9,he;q=0.8",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Referer": "https://www.yad2.co.il/",
+        "Origin": "https://www.yad2.co.il",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-site",
+        "DNT": "1"
     }
     
     for attempt in range(MAX_RETRIES):
@@ -377,6 +386,10 @@ async def main_loop(check_interval: int = 120):
             logger.info("="*60)
             API_PARAMS = API_PARAMS_SEARCH_1
             await check_yad2_listings(max_pages=1)
+            
+            # Add delay between searches to avoid bot detection
+            logger.debug("Waiting 10 seconds between searches...")
+            await asyncio.sleep(10)
             
             # Run Search 2: 4-4.5 rooms
             logger.info("\n" + "="*60)
