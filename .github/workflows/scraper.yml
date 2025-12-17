@@ -1,5 +1,9 @@
 name: Yad2 Apartment Scraper
 
+# Grant write permissions for pushing seen.json
+permissions:
+  contents: write
+
 on:
   schedule:
     # Schedule based on Israel Time (UTC+2 standard, UTC+3 daylight)
