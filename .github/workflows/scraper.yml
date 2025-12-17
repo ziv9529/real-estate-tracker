@@ -2,8 +2,14 @@ name: Yad2 Apartment Scraper
 
 on:
   schedule:
-    # Run every 5 minutes (GitHub minimum supported interval)
-    - cron: "*/5 * * * *"
+    # Schedule based on Israel Time (UTC+2 standard, UTC+3 daylight)
+    # GitHub Actions runs in UTC, so convert:
+    # 23:00 Israel (standard) = 21:00 UTC
+    - cron: "0 21 * * *"
+
+    # 06:00-23:00 Israel every 20 min = 04:00-21:00 UTC (standard) or 03:00-20:00 UTC (daylight)
+    # Using wider window to cover both winter/summer time shifts
+    - cron: "0,20,40 3-21 * * *"
 
   # Allow manual trigger from GitHub UI
   workflow_dispatch:

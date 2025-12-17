@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # Constants for error handling
 MAX_RETRIES = 3
-RETRY_DELAY = 2  # seconds
+RETRY_DELAY = 5  # seconds (increased from 2 for better resilience)
 
 load_dotenv()
 
