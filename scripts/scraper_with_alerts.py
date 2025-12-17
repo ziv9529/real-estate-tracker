@@ -362,7 +362,7 @@ async def check_yad2_listings(max_pages: int = 1):
     else:
         logger.info("No neighborhoods found in this check")
 
-async def main_loop(check_interval: int = 120):
+async def main_loop(check_interval: int = 120, run_once: bool = False):
     """Main monitoring loop - runs both searches"""
     global API_PARAMS
     load_or_initialize_seen()
@@ -377,8 +377,10 @@ async def main_loop(check_interval: int = 120):
         await check_yad2_listings(max_pages=1)
         logger.info(f"Initial load complete: {len(seen)} listings saved. Waiting for next check...")
     
-    logger.info(f"Starting monitoring loop (checking every {check_interval} seconds)")
-    while True:
+    # For GitHub Actions: run once and exit
+    # For local: run continuously with check_interval
+    if run_once:
+        logger.info("Running single check cycle (GitHub Actions mode)")
         try:
             # Run Search 1: 3-3.5 rooms
             logger.info("\n" + "="*60)
@@ -397,11 +399,36 @@ async def main_loop(check_interval: int = 120):
             logger.info("="*60)
             API_PARAMS = API_PARAMS_SEARCH_2
             await check_yad2_listings(max_pages=1)
+            
+            logger.info("Single check cycle complete. Exiting.")
         except Exception as e:
             logger.exception(f"Error during check cycle: {e}")
-        
-        logger.debug(f"Both searches complete. Waiting {check_interval} seconds before next check...")
-        await asyncio.sleep(check_interval)
+    else:
+        logger.info(f"Starting monitoring loop (checking every {check_interval} seconds)")
+        while True:
+            try:
+                # Run Search 1: 3-3.5 rooms
+                logger.info("\n" + "="*60)
+                logger.info("Running Search 1: 3-3.5 rooms, 70+ sqm, max 2.35M")
+                logger.info("="*60)
+                API_PARAMS = API_PARAMS_SEARCH_1
+                await check_yad2_listings(max_pages=1)
+                
+                # Add delay between searches to avoid bot detection
+                logger.debug("Waiting 10 seconds between searches...")
+                await asyncio.sleep(10)
+                
+                # Run Search 2: 4-4.5 rooms
+                logger.info("\n" + "="*60)
+                logger.info("Running Search 2: 4-4.5 rooms, 80+ sqm, max 2.6M")
+                logger.info("="*60)
+                API_PARAMS = API_PARAMS_SEARCH_2
+                await check_yad2_listings(max_pages=1)
+            except Exception as e:
+                logger.exception(f"Error during check cycle: {e}")
+            
+            logger.debug(f"Both searches complete. Waiting {check_interval} seconds before next check...")
+            await asyncio.sleep(check_interval)
 
 if __name__ == "__main__":
     from sys import platform
@@ -414,4 +441,12 @@ if __name__ == "__main__":
     logger.info(f"Search filters: {API_PARAMS}")
     logger.info("="*60)
     
-    asyncio.run(main_loop(check_interval=120))
+    # Check if running in GitHub Actions (via environment variable)
+    is_github_actions = os.getenv("GITHUB_ACTIONS") == "true"
+    
+    if is_github_actions:
+        logger.info("Running in GitHub Actions - single run mode")
+        asyncio.run(main_loop(run_once=True))
+    else:
+        logger.info("Running locally - continuous loop mode (every 120 seconds)")
+        asyncio.run(main_loop(check_interval=120, run_once=False))
