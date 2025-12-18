@@ -354,6 +354,38 @@ async def check_yad2_listings(max_pages: int = 1):
                     save_seen()
                     changes += 1
     
+    # Check for sold/removed apartments (in seen but not in current results)
+    logger.info("Checking for sold/removed apartments...")
+    current_urls = {f"https://www.yad2.co.il/item/{item.get('token')}" for item in all_listings}
+    sold_apartments = []
+    
+    for seen_url in list(seen.keys()):  # Create a copy of keys to iterate safely
+        if seen_url not in current_urls:
+            apartment = seen[seen_url]
+            sold_apartments.append((seen_url, apartment))
+            
+            street = apartment.get("street", "לא ידוע")
+            neighborhood = apartment.get("neighborhood", "לא ידוע")
+            floor = apartment.get("floor", "לא ידוע")
+            rooms = apartment.get("rooms", "לא ידוע")
+            price = apartment.get("price", 0)
+            
+            message = (
+                f"🏷️ הדירה הזו נמכרה! (המודעה נמחקה)\n"
+                f"רחוב: {street}\nשכונה: {neighborhood}\nקומה: {floor}\nחדרים: {rooms}\n"
+                f"מחיר: {format_price(price)} ₪\n{seen_url}"
+            )
+            logger.info(f"Apartment sold/removed: {street} - was {price}₪")
+            send_telegram(message)
+            changes += 1
+    
+    # Remove sold apartments from seen.json
+    if sold_apartments:
+        logger.info(f"Removing {len(sold_apartments)} sold/removed apartments from tracking...")
+        for sold_url, _ in sold_apartments:
+            del seen[sold_url]
+        save_seen()
+    
     logger.info(f"Check complete: {changes} changes detected. Total tracked listings: {len(seen)}")
     
     # Log all unique neighborhoods found
