@@ -246,7 +246,7 @@ async def fetch_listings(client: ClientSession, page: int = 1):
     
     return []
 
-async def check_yad2_listings(max_pages: int = 1):
+async def check_yad2_listings(max_pages: int = 1, check_sold: bool = True):
     """Check for new listings and price changes"""
     logger.info(f"Starting check for new listings and price changes (max pages: {max_pages})")
     
@@ -388,36 +388,40 @@ async def check_yad2_listings(max_pages: int = 1):
                     changes += 1
     
     # Check for sold/removed apartments (in seen but not in ORIGINAL UNFILTERED results)
-    logger.info("Checking for sold/removed apartments (from original unfiltered list)...")
-    current_urls = {f"https://www.yad2.co.il/item/{item.get('token')}" for item in all_listings_unfiltered}
-    sold_apartments = []
-    
-    for seen_url in list(seen.keys()):  # Create a copy of keys to iterate safely
-        if seen_url not in current_urls:
-            apartment = seen[seen_url]
-            sold_apartments.append((seen_url, apartment))
-            
-            street = apartment.get("street", "לא ידוע")
-            neighborhood = apartment.get("neighborhood", "לא ידוע")
-            floor = apartment.get("floor", "לא ידוע")
-            rooms = apartment.get("rooms", "לא ידוע")
-            price = apartment.get("price", 0)
-            
-            message = (
-                f"🏷️ הדירה הזו נמכרה! (המודעה נמחקה)\n"
-                f"רחוב: {street}\nשכונה: {neighborhood}\nקומה: {floor}\nחדרים: {rooms}\n"
-                f"מחיר: {format_price(price)} ₪\n{seen_url}"
-            )
-            logger.info(f"Apartment sold/removed: {street} - was {price}₪")
-            send_telegram(message)
-            changes += 1
-    
-    # Remove sold apartments from seen.json
-    if sold_apartments:
-        logger.info(f"Removing {len(sold_apartments)} sold/removed apartments from tracking...")
-        for sold_url, _ in sold_apartments:
-            del seen[sold_url]
-        save_seen()
+    # ONLY check if this is not the initial load (to avoid false deletes when loading from multiple searches)
+    if check_sold:
+        logger.info("Checking for sold/removed apartments (from original unfiltered list)...")
+        current_urls = {f"https://www.yad2.co.il/item/{item.get('token')}" for item in all_listings_unfiltered}
+        sold_apartments = []
+        
+        for seen_url in list(seen.keys()):  # Create a copy of keys to iterate safely
+            if seen_url not in current_urls:
+                apartment = seen[seen_url]
+                sold_apartments.append((seen_url, apartment))
+                
+                street = apartment.get("street", "לא ידוע")
+                neighborhood = apartment.get("neighborhood", "לא ידוע")
+                floor = apartment.get("floor", "לא ידוע")
+                rooms = apartment.get("rooms", "לא ידוע")
+                price = apartment.get("price", 0)
+                
+                message = (
+                    f"🏷️ הדירה הזו נמכרה! (המודעה נמחקה)\n"
+                    f"רחוב: {street}\nשכונה: {neighborhood}\nקומה: {floor}\nחדרים: {rooms}\n"
+                    f"מחיר: {format_price(price)} ₪\n{seen_url}"
+                )
+                logger.info(f"Apartment sold/removed: {street} - was {price}₪")
+                send_telegram(message)
+                changes += 1
+        
+        # Remove sold apartments from seen.json
+        if sold_apartments:
+            logger.info(f"Removing {len(sold_apartments)} sold/removed apartments from tracking...")
+            for sold_url, _ in sold_apartments:
+                del seen[sold_url]
+            save_seen()
+    else:
+        logger.info("Skipping sold apartment check (initial load phase)")
     
     logger.info(f"Check complete: {changes} changes detected. Total tracked listings: {len(seen)}")
     
@@ -435,11 +439,11 @@ async def main_loop(check_interval: int = 120, run_once: bool = False):
     # Initial load - don't send alerts on first run
     if len(seen) == 0:
         logger.info("First run: Loading all current listings without sending alerts...")
-        # Load from both searches
+        # Load from both searches (skip sold check to avoid false positives)
         API_PARAMS = API_PARAMS_SEARCH_1
-        await check_yad2_listings(max_pages=1)
+        await check_yad2_listings(max_pages=1, check_sold=False)
         API_PARAMS = API_PARAMS_SEARCH_2
-        await check_yad2_listings(max_pages=1)
+        await check_yad2_listings(max_pages=1, check_sold=False)
         logger.info(f"Initial load complete: {len(seen)} listings saved. Waiting for next check...")
     
     # For GitHub Actions: run once and exit
@@ -452,7 +456,7 @@ async def main_loop(check_interval: int = 120, run_once: bool = False):
             logger.info("Running Search 1: 3-3.5 rooms, 70+ sqm, max 2.35M")
             logger.info("="*60)
             API_PARAMS = API_PARAMS_SEARCH_1
-            await check_yad2_listings(max_pages=1)
+            await check_yad2_listings(max_pages=1, check_sold=True)
             
             # Add delay between searches to avoid bot detection
             logger.debug("Waiting 10 seconds between searches...")
@@ -463,7 +467,7 @@ async def main_loop(check_interval: int = 120, run_once: bool = False):
             logger.info("Running Search 2: 4-4.5 rooms, 80+ sqm, max 2.6M")
             logger.info("="*60)
             API_PARAMS = API_PARAMS_SEARCH_2
-            await check_yad2_listings(max_pages=1)
+            await check_yad2_listings(max_pages=1, check_sold=True)
             
             logger.info("Single check cycle complete. Exiting.")
         except Exception as e:
