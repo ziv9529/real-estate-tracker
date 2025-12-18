@@ -9,16 +9,6 @@
     "phone": "055-4361115",
     "token": "sw7cyuw7"
   },
-  "https://www.yad2.co.il/item/sf75r2uq": {
-    "price": 2350000,
-    "rooms": 3,
-    "street": "שלמה לוי",
-    "neighborhood": "נרקיסים",
-    "floor": 12,
-    "sqm": 90,
-    "phone": null,
-    "token": "sf75r2uq"
-  },
   "https://www.yad2.co.il/item/duvn5q5r": {
     "price": 2680000,
     "rooms": 4,
@@ -49,34 +39,14 @@
     "phone": null,
     "token": "8jog0kcc"
   },
-  "https://www.yad2.co.il/item/42wn2ues": {
-    "price": 2550000,
-    "rooms": 4,
-    "street": "אורנה פורת",
+  "https://www.yad2.co.il/item/ryr446gv": {
+    "price": 2199000,
+    "rooms": 3,
+    "street": "חיים חפר",
     "neighborhood": "הרקפות",
     "floor": 2,
-    "sqm": 120,
-    "phone": null,
-    "token": "42wn2ues"
-  },
-  "https://www.yad2.co.il/item/xrkrr8yy": {
-    "price": 2299000,
-    "rooms": 3,
-    "street": "לא ידוע",
-    "neighborhood": "נרקיסים",
-    "floor": 3,
-    "sqm": 90,
-    "phone": null,
-    "token": "xrkrr8yy"
-  },
-  "https://www.yad2.co.il/item/apwh2nf5": {
-    "price": 2150000,
-    "rooms": 3,
-    "street": "דודו דותן",
-    "neighborhood": "הרקפות",
-    "floor": 6,
-    "sqm": 88,
-    "phone": null,
-    "token": "apwh2nf5"
+    "sqm": 89,
+    "phone": "055-4524659",
+    "token": "ryr446gv"
   }
 }
