@@ -108,5 +108,15 @@
     "sqm": 93,
     "phone": null,
     "token": "z2vy5asn"
+  },
+  "https://www.yad2.co.il/item/slrlj7ic": {
+    "price": 2270000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "floor": 17,
+    "sqm": 88,
+    "phone": null,
+    "token": "slrlj7ic"
   }
 }
