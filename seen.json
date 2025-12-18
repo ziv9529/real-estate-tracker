@@ -1,1 +1,42 @@
-{}
+{
+  "https://www.yad2.co.il/item/duvn5q5r": {
+    "price": 2680000,
+    "rooms": 4,
+    "street": "אריק איינשטיין",
+    "neighborhood": "הרקפות",
+    "floor": 3,
+    "sqm": 107,
+    "phone": null,
+    "token": "duvn5q5r"
+  },
+  "https://www.yad2.co.il/item/zr8nsk4i": {
+    "price": 2680000,
+    "rooms": 4,
+    "street": "אורנה פורת",
+    "neighborhood": "הרקפות",
+    "floor": 3,
+    "sqm": 120,
+    "phone": null,
+    "token": "zr8nsk4i"
+  },
+  "https://www.yad2.co.il/item/8jog0kcc": {
+    "price": 2690000,
+    "rooms": 4,
+    "street": "אורנה פורת",
+    "neighborhood": "הרקפות",
+    "floor": 5,
+    "sqm": 120,
+    "phone": null,
+    "token": "8jog0kcc"
+  },
+  "https://www.yad2.co.il/item/42wn2ues": {
+    "price": 2550000,
+    "rooms": 4,
+    "street": "אורנה פורת",
+    "neighborhood": "הרקפות",
+    "floor": 2,
+    "sqm": 120,
+    "phone": null,
+    "token": "42wn2ues"
+  }
+}
