@@ -108,5 +108,15 @@
     "sqm": 88,
     "phone": null,
     "token": "slrlj7ic"
+  },
+  "https://www.yad2.co.il/item/txpr11yk": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "floor": 4,
+    "sqm": 90,
+    "phone": null,
+    "token": "txpr11yk"
   }
 }
