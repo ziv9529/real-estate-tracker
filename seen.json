@@ -88,5 +88,15 @@
     "sqm": 75,
     "phone": "055-4361115",
     "token": "sw7cyuw7"
+  },
+  "https://www.yad2.co.il/item/ryr446gv": {
+    "price": 2199000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "floor": 2,
+    "sqm": 89,
+    "phone": null,
+    "token": "ryr446gv"
   }
 }
