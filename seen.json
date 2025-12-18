@@ -68,5 +68,15 @@
     "sqm": 93,
     "phone": null,
     "token": "201bgvr5"
+  },
+  "https://www.yad2.co.il/item/wu158yck": {
+    "price": 2325000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "floor": 2,
+    "sqm": 90,
+    "phone": null,
+    "token": "wu158yck"
   }
 }
