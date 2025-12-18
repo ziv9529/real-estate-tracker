@@ -88,5 +88,15 @@
     "sqm": 90,
     "phone": "055-4528217",
     "token": "cl0ypx01"
+  },
+  "https://www.yad2.co.il/item/sf75r2uq": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "שלמה לוי",
+    "neighborhood": "נרקיסים",
+    "floor": 12,
+    "sqm": 90,
+    "phone": "055-4308354",
+    "token": "sf75r2uq"
   }
 }
