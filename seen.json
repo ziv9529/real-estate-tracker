@@ -1,4 +1,14 @@
 {
+  "https://www.yad2.co.il/item/ryr446gv": {
+    "price": 2199000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "floor": 2,
+    "sqm": 89,
+    "phone": "055-4524659",
+    "token": "ryr446gv"
+  },
   "https://www.yad2.co.il/item/sw7cyuw7": {
     "price": 2290000,
     "rooms": 3,
@@ -16,7 +26,7 @@
     "neighborhood": "הרקפות",
     "floor": 3,
     "sqm": 107,
-    "phone": null,
+    "phone": "050-7613337",
     "token": "duvn5q5r"
   },
   "https://www.yad2.co.il/item/zr8nsk4i": {
@@ -26,7 +36,7 @@
     "neighborhood": "הרקפות",
     "floor": 3,
     "sqm": 120,
-    "phone": null,
+    "phone": "055-2121047",
     "token": "zr8nsk4i"
   },
   "https://www.yad2.co.il/item/8jog0kcc": {
@@ -36,17 +46,17 @@
     "neighborhood": "הרקפות",
     "floor": 5,
     "sqm": 120,
-    "phone": null,
+    "phone": "055-2129795",
     "token": "8jog0kcc"
   },
-  "https://www.yad2.co.il/item/ryr446gv": {
-    "price": 2199000,
-    "rooms": 3,
-    "street": "חיים חפר",
+  "https://www.yad2.co.il/item/42wn2ues": {
+    "price": 2550000,
+    "rooms": 4,
+    "street": "אורנה פורת",
     "neighborhood": "הרקפות",
     "floor": 2,
-    "sqm": 89,
-    "phone": "055-4524659",
-    "token": "ryr446gv"
+    "sqm": 120,
+    "phone": "055-4369816",
+    "token": "42wn2ues"
   }
 }
