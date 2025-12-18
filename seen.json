@@ -78,5 +78,15 @@
     "sqm": 90,
     "phone": null,
     "token": "wu158yck"
+  },
+  "https://www.yad2.co.il/item/cl0ypx01": {
+    "price": 2200000,
+    "rooms": 3,
+    "street": "הלוחמות",
+    "neighborhood": "נרקיסים",
+    "floor": 2,
+    "sqm": 90,
+    "phone": "055-4528217",
+    "token": "cl0ypx01"
   }
 }
