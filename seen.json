@@ -98,5 +98,15 @@
     "sqm": 90,
     "phone": "055-4308354",
     "token": "sf75r2uq"
+  },
+  "https://www.yad2.co.il/item/z2vy5asn": {
+    "price": 2290000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "הרקפות",
+    "floor": 2,
+    "sqm": 93,
+    "phone": null,
+    "token": "z2vy5asn"
   }
 }
