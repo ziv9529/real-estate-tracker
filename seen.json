@@ -478,5 +478,89 @@
     "phone": "053-6310312",
     "token": "my6pnv0s",
     "is_private": false
+  },
+  "https://www.yad2.co.il/item/5vzia1vx": {
+    "price": 2290000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נוריות",
+    "city": "ראשון לציון",
+    "floor": 10,
+    "sqm": 86,
+    "phone": "055-4559813",
+    "token": "5vzia1vx",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/i2w33px5": {
+    "price": 2150000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 95,
+    "phone": "055-4369816",
+    "token": "i2w33px5",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/lhxgqyd1": {
+    "price": 2199000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 89,
+    "phone": null,
+    "token": "lhxgqyd1",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/4hk9ogl1": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 92,
+    "phone": null,
+    "token": "4hk9ogl1",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/rmgn3zps": {
+    "price": 2200000,
+    "rooms": 3,
+    "street": "אלי יבלון",
+    "neighborhood": "נוריות",
+    "city": "ראשון לציון",
+    "floor": 9,
+    "sqm": 81,
+    "phone": null,
+    "token": "rmgn3zps",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/201bgvr5": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 93,
+    "phone": null,
+    "token": "201bgvr5",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/mvdccyni": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "הצבר",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 6,
+    "sqm": 80,
+    "phone": "055-4518809",
+    "token": "mvdccyni",
+    "is_private": false
   }
 }
