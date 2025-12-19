@@ -94,6 +94,7 @@ def send_telegram(text: str):
         payload = {
             "chat_id": TELEGRAM_CHAT_ID,
             "text": text,
+            "parse_mode": "Markdown",
             "disable_web_page_preview": True,
         }
         r = requests.post(TELEGRAM_SEND_URL, json=payload, timeout=20)
@@ -131,8 +132,8 @@ def extract_listing_data(item):
     """Extract relevant data from listing item"""
     token = item.get("token")
     address = item.get("address", {})
-    # Check if listing is private (from data.private) or agency
-    is_private = "private" in item  # or item.get("source") == "private"
+    # Check if listing is private or agency based on adType field
+    is_private = item.get("adType") == "private"
     return {
         "price": item.get("price", 0),
         "rooms": item.get("additionalDetails", {}).get("roomsCount"),
@@ -302,7 +303,7 @@ async def check_yad2_listings():
                     old_url, old_data = is_possible_duplicate(item_data)
                     if old_url:
                         message = (
-                            f"🔁 יתכן שזו אותה דירה שפורסמה מחדש ע\"י אותו מפרסם(מניאק):\n"
+                            f"🔁 יתכן שזו אותה דירה שפורסמה מחדש ע\"י אותו מפרסם:\n"
                             f"עיר: {city}\nרחוב: {street}\nשכונה: {neighborhood}\nקומה: {floor}\nחדרים: {rooms}\nמ\"ר: {sqm}\n"
                             f"מחיר קודם: {format_price(old_data['price'])} ₪\n"
                             f"מחיר חדש: {format_price(price)} ₪\n"
@@ -316,14 +317,17 @@ async def check_yad2_listings():
                         # Build neighborhood line only if it's not "לא ידוע"
                         neighborhood_line = f"שכונה: {neighborhood}, " if neighborhood != "לא ידוע" else ""
                         # Determine if private or agency
-                        listing_type = "פרטי" if item_data.get("is_private") else "תיווך"
+                        is_private = item_data.get("is_private")
+                        listing_type = "פרטי" if is_private else "תיווך"
+                        # Bold only if private
+                        listing_type_formatted = f"*{listing_type}*" if is_private else listing_type
                         message = (
                             f"🔔 דירה חדשה ביד2!\n"
                             f"עיר: {city}, {neighborhood_line}רחוב: {street}\n"
                             f"חדרים: {rooms}, קומה: {floor}\n"
                             f"שטח בנוי: {sqm} מ\"ר\n"
                             f"מחיר: {format_price(price)} ₪\n"
-                            f"({listing_type})\n"
+                            f"({listing_type_formatted})\n"
                             f"טלפון: {phone_str}\n"
                             f"{url}"
                         )
