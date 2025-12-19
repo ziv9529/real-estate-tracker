@@ -574,5 +574,53 @@
     "phone": null,
     "token": "ay68rrp3",
     "is_private": false
+  },
+  "https://www.yad2.co.il/item/5pit9jya": {
+    "price": 2250000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 6,
+    "sqm": 90,
+    "phone": null,
+    "token": "5pit9jya",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/hpqvpv84": {
+    "price": 2300000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 5,
+    "sqm": 92,
+    "phone": null,
+    "token": "hpqvpv84",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/68k92evo": {
+    "price": 2290000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 11,
+    "sqm": 85,
+    "phone": null,
+    "token": "68k92evo",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/314v5h7z": {
+    "price": 2250000,
+    "rooms": 3,
+    "street": "יעקב בן סירא",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 90,
+    "phone": null,
+    "token": "314v5h7z",
+    "is_private": false
   }
 }
