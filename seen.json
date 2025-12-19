@@ -622,5 +622,17 @@
     "phone": null,
     "token": "314v5h7z",
     "is_private": false
+  },
+  "https://www.yad2.co.il/item/lhxgqyd1": {
+    "price": 2199000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 89,
+    "phone": null,
+    "token": "lhxgqyd1",
+    "is_private": false
   }
 }
