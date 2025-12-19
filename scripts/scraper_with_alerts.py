@@ -364,10 +364,13 @@ async def check_yad2_listings():
                     # New listing - check if it's a duplicate repost
                     old_url, old_data = is_possible_duplicate(item_data)
                     if old_url:
-                        # This is a duplicate apartment - check if price changed
+                        # This is a duplicate apartment - verify with exact sqm and phone
+                        exact_sqm_match = old_data.get("sqm") == item_data.get("sqm")
+                        same_phone = old_data.get("phone") == phone_str
                         price_changed = old_data.get("price") != price
                         
-                        if price_changed:
+                        # Only send alert if it's a true duplicate (exact sqm + same phone)
+                        if exact_sqm_match and same_phone and price_changed:
                             # Duplicate with price change
                             message = (
                                 f"🔁 יתכן שזו אותה דירה שפורסמה מחדש ע\"י אותו מפרסם:\n"
@@ -381,8 +384,8 @@ async def check_yad2_listings():
                             logger.info(f"Potential repost with price change detected: {street}")
                             send_telegram(message)
                         else:
-                            # Same apartment, same price - don't send a message, just log
-                            logger.info(f"Duplicate listing (same apartment, same price): {street} - {price}₪")
+                            # Possible duplicate but details don't fully match - just log
+                            logger.info(f"Similar listing found but not exact match: {street} (sqm_match={exact_sqm_match}, phone_match={same_phone}, price_changed={price_changed})")
                     else:
                         # Truly new listing - send new apartment alert
                         # Build neighborhood line only if it's not "לא ידוע"
@@ -449,29 +452,23 @@ async def main_loop(check_interval: int = 120, run_once: bool = False):
             logger.exception(f"Error during check cycle: {e}")
     else:
         logger.info(f"Starting monitoring loop (checking every {check_interval} seconds)")
-        try:
-            while True:
-                try:
-                    # Run Search 1: 3-3.5 rooms
-                    logger.info("Running Search 1: 3-3.5 rooms")
-                    API_PARAMS = API_PARAMS_SEARCH_1
-                    await check_yad2_listings()
-                    
-                    await asyncio.sleep(10)
-                    
-                    # Run Search 2: 4-4.5 rooms
-                    logger.info("Running Search 2: 4-4.5 rooms")
-                    API_PARAMS = API_PARAMS_SEARCH_2
-                    await check_yad2_listings()
-                except Exception as e:
-                    logger.exception(f"Error during check cycle: {e}")
+        while True:
+            try:
+                # Run Search 1: 3-3.5 rooms
+                logger.info("Running Search 1: 3-3.5 rooms")
+                API_PARAMS = API_PARAMS_SEARCH_1
+                await check_yad2_listings()
                 
-                await asyncio.sleep(check_interval)
-        except KeyboardInterrupt:
-            logger.info("Received Ctrl+C - shutting down gracefully...")
-            save_seen()
-            save_phone_cache()
-            logger.info("Cache saved. Goodbye!")
+                await asyncio.sleep(10)
+                
+                # Run Search 2: 4-4.5 rooms
+                logger.info("Running Search 2: 4-4.5 rooms")
+                API_PARAMS = API_PARAMS_SEARCH_2
+                await check_yad2_listings()
+            except Exception as e:
+                logger.exception(f"Error during check cycle: {e}")
+            
+            await asyncio.sleep(check_interval)
 
 if __name__ == "__main__":
     from sys import platform
@@ -483,13 +480,9 @@ if __name__ == "__main__":
     # Check if running in GitHub Actions (via environment variable)
     is_github_actions = os.getenv("GITHUB_ACTIONS") == "true"
     
-    try:
-        if is_github_actions:
-            logger.info("Running in GitHub Actions - single run mode")
-            asyncio.run(main_loop(run_once=True))
-        else:
-            logger.info("Running locally - continuous loop mode (every 120 seconds)")
-            asyncio.run(main_loop(check_interval=120, run_once=False))
-    except KeyboardInterrupt:
-        logger.info("\nKeyboardInterrupt caught at main level - exiting")
-        exit(0)
+    if is_github_actions:
+        logger.info("Running in GitHub Actions - single run mode")
+        asyncio.run(main_loop(run_once=True))
+    else:
+        logger.info("Running locally - continuous loop mode (every 120 seconds)")
+        asyncio.run(main_loop(check_interval=120, run_once=False))
