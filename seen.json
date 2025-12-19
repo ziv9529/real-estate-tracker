@@ -634,5 +634,17 @@
     "phone": null,
     "token": "lhxgqyd1",
     "is_private": false
+  },
+  "https://www.yad2.co.il/item/926ukemm": {
+    "price": 2240000,
+    "rooms": 3,
+    "street": "יעקב בן סירא",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 88,
+    "phone": null,
+    "token": "926ukemm",
+    "is_private": false
   }
 }
