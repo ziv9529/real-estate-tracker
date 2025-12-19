@@ -138,5 +138,15 @@
     "sqm": 92,
     "phone": null,
     "token": "1c7lebi6"
+  },
+  "https://www.yad2.co.il/item/0vjgs9qr": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "יעקב בן סירא",
+    "neighborhood": "הרקפות",
+    "floor": 2,
+    "sqm": 89,
+    "phone": null,
+    "token": "0vjgs9qr"
   }
 }
