@@ -39,6 +39,9 @@ API_BASE_URL = "https://gw.yad2.co.il/realestate-feed/forsale/feed"
 # Search 1: 3-3.5 rooms, 70+ sqm, max 2.35M
 API_PARAMS_SEARCH_1 = {
     "city": "8300",
+    "multiNeighborhood": "991420,991421,991415,325",
+    "area": "9",
+    "topArea": "2",
     "property": "1",  # apartment
     "maxPrice": "2350000",
     "minRooms": "3",
@@ -52,6 +55,9 @@ API_PARAMS_SEARCH_1 = {
 # Search 2: 4-4.5 rooms, 80+ sqm, max 2.6M
 API_PARAMS_SEARCH_2 = {
     "city": "8300",
+    "multiNeighborhood": "991420,991421,991415,325",
+    "area": "9",
+    "topArea": "2",
     "property": "1",  # apartment
     "maxPrice": "2700000",
     "minRooms": "4",
@@ -66,20 +72,8 @@ API_PARAMS_SEARCH_2 = {
 API_PARAMS = API_PARAMS_SEARCH_1
 
 # === Neighborhood Filter ===
-# OPTION 1: Filter by neighborhood NAMES (post-API filtering) - slower
-# Set to empty list [] to accept ALL neighborhoods
-WANTED_NEIGHBORHOODS = [
-    'הרקפות',
-    'נרקיסים',
-    'נוריות',
-    'נחלת יהודה',
-]
-
-# OPTION 2: Filter by neighborhood IDS (API-level filtering) - MUCH FASTER
-# Use discover_neighborhoods.py to find IDs for your city first!
-# Leave empty [] to disable this filter and get all neighborhoods
-WANTED_NEIGHBORHOOD_IDS = []
-# (Name-based filtering is enabled above, so API-level filtering is disabled)
+# Filtering is now done at API level via multiNeighborhood parameter
+WANTED_NEIGHBORHOODS = []
 
 # === Seen Ads ===
 SEEN_FILE = "seen.json"
@@ -137,22 +131,30 @@ def extract_listing_data(item):
     """Extract relevant data from listing item"""
     token = item.get("token")
     address = item.get("address", {})
+    # Check if listing is private (from data.private) or agency
+    is_private = "private" in item  # or item.get("source") == "private"
     return {
         "price": item.get("price", 0),
         "rooms": item.get("additionalDetails", {}).get("roomsCount"),
         "street": address.get("street", {}).get("text", "לא ידוע"),
         "neighborhood": address.get("neighborhood", {}).get("text", "לא ידוע"),
+        "city": address.get("city", {}).get("text", "לא ידוע"),
         "floor": address.get("house", {}).get("floor", "לא ידוע"),
         "sqm": item.get("additionalDetails", {}).get("squareMeter", 0),
         "phone": None,  # Will be filled async
         "token": token,
+        "is_private": is_private,
     }
 
 def is_possible_duplicate(new_item_data):
     """Check if listing is a repost by the same seller"""
     for url, old in seen.items():
+        # Compare ALL attributes to identify the same apartment
         if (
-            old.get("street") == new_item_data.get("street")
+            old.get("city") == new_item_data.get("city")
+            and old.get("neighborhood") == new_item_data.get("neighborhood")
+            and old.get("street") == new_item_data.get("street")
+            and old.get("floor") == new_item_data.get("floor")
             and old.get("rooms") == new_item_data.get("rooms")
             and abs(old.get("sqm", 0) - new_item_data.get("sqm", 0)) <= 3
             and old.get("price") != new_item_data.get("price")
@@ -183,17 +185,8 @@ async def fetch_listings(client: ClientSession, page: int = 1):
     for attempt in range(MAX_RETRIES):
         try:
             params = {**API_PARAMS, "page": str(page)}
-            
-            # Add neighborhood IDs to API call if specified
-            if WANTED_NEIGHBORHOOD_IDS:
-                params["multiNeighborhood"] = ",".join(map(str, WANTED_NEIGHBORHOOD_IDS))
-                logger.debug(f"Using neighborhood filter: {WANTED_NEIGHBORHOOD_IDS}")
-            
             url = f"{API_BASE_URL}?{urlencode(params)}"
-            
-            logger.debug(f"Fetching page {page} (attempt {attempt + 1}/{MAX_RETRIES}): {url}")
             response = await client.get(url, timeout=20, headers=headers)
-            logger.debug(f"Page {page} response status: {response.status}")
             
             # Check if we got HTML instead of JSON (bot detection)
             content_type = response.headers.get('content-type', '')
@@ -208,24 +201,22 @@ async def fetch_listings(client: ClientSession, page: int = 1):
             
             data = await response.json()
             
-            # Get all results from all categories (private, agency, etc.)
+            # Get all results from all categories (private, agency, etc.), excluding yad1
             data_container = data.get("data", {})
-            logger.debug(f"Page {page}: Available data keys: {list(data_container.keys())}")
-            
             results = []
             
-            # Try to get results from all possible keys (not just "markers")
+            # Try to get results from all possible keys, excluding yad1
             for key, value in data_container.items():
-                if isinstance(value, list):
-                    logger.debug(f"Page {page}: Found {len(value)} listings in '{key}'")
+                if key != "yad1" and isinstance(value, list):
                     results.extend(value)
             
-            logger.info(f"Page {page}: Retrieved {len(results)} listings total (from all categories)")
+            # Extract pagination info
+            pagination = data.get("pagination", {})
+            total_pages = pagination.get("totalPages", 1)
             
-            if len(results) == 0:
-                logger.warning(f"Page {page}: No listings returned")
+            logger.info(f"Page {page}/{total_pages}: Retrieved {len(results)} listings")
             
-            return results
+            return results, total_pages
             
         except asyncio.TimeoutError:
             logger.warning(f"Page {page} attempt {attempt + 1}: Timeout. Retrying...")
@@ -234,7 +225,7 @@ async def fetch_listings(client: ClientSession, page: int = 1):
                 continue
             else:
                 logger.error(f"Page {page}: Timeout after {MAX_RETRIES} attempts")
-                return []
+                return [], 0
         except Exception as e:
             logger.warning(f"Page {page} attempt {attempt + 1}: {type(e).__name__}: {e}")
             if attempt < MAX_RETRIES - 1:
@@ -242,49 +233,29 @@ async def fetch_listings(client: ClientSession, page: int = 1):
                 continue
             else:
                 logger.error(f"Page {page}: Failed after {MAX_RETRIES} attempts")
-                return []
+                return [], 0
     
-    return []
+    return [], 0
 
-async def check_yad2_listings(max_pages: int = 1):
+async def check_yad2_listings():
     """Check for new listings and price changes"""
-    logger.info(f"Starting check for new listings and price changes (max pages: {max_pages})")
-    
     changes = 0
     all_listings = []
     neighborhoods_found = set()  # Track unique neighborhoods
     
     async with ClientSession() as client:
-        # Fetch all pages
-        logger.info(f"Fetching {max_pages} page(s)...")
-        tasks = []
-        for page in range(1, max_pages + 1):
-            tasks.append(fetch_listings(client, page))
+        # Fetch all pages based on pagination
+        page = 1
+        total_pages = 1
         
-        results = await asyncio.gather(*tasks)
-        for page_results in results:
+        while page <= total_pages:
+            page_results, total_pages = await fetch_listings(client, page)
             all_listings.extend(page_results)
-        
-        logger.info(f"Total listings fetched: {len(all_listings)}")
+            page += 1
         
         if len(all_listings) == 0:
-            logger.warning("No listings fetched! This might indicate an API issue or no results match your criteria.")
+            logger.warning("No listings fetched!")
             return
-        
-        # Apply neighborhood filter if configured (post-API filtering by name)
-        if WANTED_NEIGHBORHOODS:
-            logger.info(f"Filtering to only wanted neighborhoods: {WANTED_NEIGHBORHOODS}")
-            filtered_listings = [item for item in all_listings if item.get("address", {}).get("neighborhood", {}).get("text") in WANTED_NEIGHBORHOODS]
-            logger.info(f"Filtered from {len(all_listings)} to {len(filtered_listings)} listings")
-            all_listings = filtered_listings
-            
-            if len(all_listings) == 0:
-                logger.warning("No listings match your wanted neighborhoods. Skipping this check.")
-                return
-        elif WANTED_NEIGHBORHOOD_IDS:
-            logger.info(f"Neighborhood IDs filter already applied at API level: {WANTED_NEIGHBORHOOD_IDS}")
-        else:
-            logger.info("No neighborhood filter applied - processing all listings")
         
         # Fetch contact info for each listing
         logger.info(f"Fetching contact info for {len(all_listings)} listings...")
@@ -301,6 +272,7 @@ async def check_yad2_listings(max_pages: int = 1):
                 rooms = item_data["rooms"]
                 street = item_data["street"]
                 neighborhood = item_data["neighborhood"]
+                city = item_data["city"]
                 floor = item_data["floor"]
                 sqm = item_data["sqm"]
                 phone_str = item_data["phone"]
@@ -308,8 +280,6 @@ async def check_yad2_listings(max_pages: int = 1):
                 # Track neighborhoods
                 if neighborhood != "לא ידוע":
                     neighborhoods_found.add(neighborhood)
-                
-                logger.debug(f"Processing {index}/{len(all_listings)}: {street} - {neighborhood} - {rooms} rooms - קומה {floor} - {price}₪")
                 
                 # Check if listing is already tracked
                 if url in seen:
@@ -320,7 +290,7 @@ async def check_yad2_listings(max_pages: int = 1):
                         
                         message = (
                             f"💸 שינוי במחיר מודעה קיימת:\n"
-                            f"רחוב: {street}\nשכונה: {neighborhood}\nקומה: {floor}\nחדרים: {rooms}\n"
+                            f"עיר: {city}\nרחוב: {street}\nשכונה: {neighborhood}\nקומה: {floor}\nחדרים: {rooms}\n"
                             f"מחיר קודם: {format_price(old_price)} ₪\n"
                             f"מחיר חדש: {format_price(price)} ₪\n{url}"
                         )
@@ -333,7 +303,7 @@ async def check_yad2_listings(max_pages: int = 1):
                     if old_url:
                         message = (
                             f"🔁 יתכן שזו אותה דירה שפורסמה מחדש ע\"י אותו מפרסם(מניאק):\n"
-                            f"רחוב: {street}\nשכונה: {neighborhood}\nקומה: {floor}\nחדרים: {rooms}\nמ\"ר: {sqm}\n"
+                            f"עיר: {city}\nרחוב: {street}\nשכונה: {neighborhood}\nקומה: {floor}\nחדרים: {rooms}\nמ\"ר: {sqm}\n"
                             f"מחיר קודם: {format_price(old_data['price'])} ₪\n"
                             f"מחיר חדש: {format_price(price)} ₪\n"
                             f"טלפון: {phone_str}\n"
@@ -343,9 +313,19 @@ async def check_yad2_listings(max_pages: int = 1):
                         logger.info(f"Potential repost detected: {street} - {phone_str}")
                         send_telegram(message)
                     else:
+                        # Build neighborhood line only if it's not "לא ידוע"
+                        neighborhood_line = f"שכונה: {neighborhood}, " if neighborhood != "לא ידוע" else ""
+                        # Determine if private or agency
+                        listing_type = "פרטי" if item_data.get("is_private") else "תיווך"
                         message = (
-                            f"🔔 דירה חדשה ביד2!\nרחוב: {street}\nשכונה: {neighborhood}\nקומה: {floor}\nחדרים: {rooms}\n"
-                            f"מ\"ר: {sqm}\nמחיר: {format_price(price)} ₪\nטלפון: {phone_str}\n{url}"
+                            f"🔔 דירה חדשה ביד2!\n"
+                            f"עיר: {city}, {neighborhood_line}רחוב: {street}\n"
+                            f"חדרים: {rooms}, קומה: {floor}\n"
+                            f"שטח בנוי: {sqm} מ\"ר\n"
+                            f"מחיר: {format_price(price)} ₪\n"
+                            f"({listing_type})\n"
+                            f"טלפון: {phone_str}\n"
+                            f"{url}"
                         )
                         logger.info(f"New listing found: {street} - {price}₪")
                         send_telegram(message)
@@ -355,12 +335,6 @@ async def check_yad2_listings(max_pages: int = 1):
                     changes += 1
     
     logger.info(f"Check complete: {changes} changes detected. Total tracked listings: {len(seen)}")
-    
-    # Log all unique neighborhoods found
-    if neighborhoods_found:
-        logger.info(f"Neighborhoods found in this check ({len(neighborhoods_found)} unique): {sorted(neighborhoods_found)}")
-    else:
-        logger.info("No neighborhoods found in this check")
 
 async def main_loop(check_interval: int = 120, run_once: bool = False):
     """Main monitoring loop - runs both searches"""
@@ -372,9 +346,9 @@ async def main_loop(check_interval: int = 120, run_once: bool = False):
         logger.info("First run: Loading all current listings without sending alerts...")
         # Load from both searches
         API_PARAMS = API_PARAMS_SEARCH_1
-        await check_yad2_listings(max_pages=1)
+        await check_yad2_listings()
         API_PARAMS = API_PARAMS_SEARCH_2
-        await check_yad2_listings(max_pages=1)
+        await check_yad2_listings()
         logger.info(f"Initial load complete: {len(seen)} listings saved. Waiting for next check...")
     
     # For GitHub Actions: run once and exit
@@ -383,22 +357,16 @@ async def main_loop(check_interval: int = 120, run_once: bool = False):
         logger.info("Running single check cycle (GitHub Actions mode)")
         try:
             # Run Search 1: 3-3.5 rooms
-            logger.info("\n" + "="*60)
-            logger.info("Running Search 1: 3-3.5 rooms, 70+ sqm, max 2.35M")
-            logger.info("="*60)
+            logger.info("Running Search 1: 3-3.5 rooms")
             API_PARAMS = API_PARAMS_SEARCH_1
-            await check_yad2_listings(max_pages=1)
+            await check_yad2_listings()
             
-            # Add delay between searches to avoid bot detection
-            logger.debug("Waiting 10 seconds between searches...")
             await asyncio.sleep(10)
             
             # Run Search 2: 4-4.5 rooms
-            logger.info("\n" + "="*60)
-            logger.info("Running Search 2: 4-4.5 rooms, 80+ sqm, max 2.6M")
-            logger.info("="*60)
+            logger.info("Running Search 2: 4-4.5 rooms")
             API_PARAMS = API_PARAMS_SEARCH_2
-            await check_yad2_listings(max_pages=1)
+            await check_yad2_listings()
             
             logger.info("Single check cycle complete. Exiting.")
         except Exception as e:
@@ -408,26 +376,19 @@ async def main_loop(check_interval: int = 120, run_once: bool = False):
         while True:
             try:
                 # Run Search 1: 3-3.5 rooms
-                logger.info("\n" + "="*60)
-                logger.info("Running Search 1: 3-3.5 rooms, 70+ sqm, max 2.35M")
-                logger.info("="*60)
+                logger.info("Running Search 1: 3-3.5 rooms")
                 API_PARAMS = API_PARAMS_SEARCH_1
-                await check_yad2_listings(max_pages=1)
+                await check_yad2_listings()
                 
-                # Add delay between searches to avoid bot detection
-                logger.debug("Waiting 10 seconds between searches...")
                 await asyncio.sleep(10)
                 
                 # Run Search 2: 4-4.5 rooms
-                logger.info("\n" + "="*60)
-                logger.info("Running Search 2: 4-4.5 rooms, 80+ sqm, max 2.6M")
-                logger.info("="*60)
+                logger.info("Running Search 2: 4-4.5 rooms")
                 API_PARAMS = API_PARAMS_SEARCH_2
-                await check_yad2_listings(max_pages=1)
+                await check_yad2_listings()
             except Exception as e:
                 logger.exception(f"Error during check cycle: {e}")
             
-            logger.debug(f"Both searches complete. Waiting {check_interval} seconds before next check...")
             await asyncio.sleep(check_interval)
 
 if __name__ == "__main__":
@@ -435,11 +396,7 @@ if __name__ == "__main__":
     if platform.startswith("win"):
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     
-    logger.info("="*60)
     logger.info("Starting Yad2 Apartment Monitor with Telegram Alerts")
-    logger.info(f"API: {API_BASE_URL}")
-    logger.info(f"Search filters: {API_PARAMS}")
-    logger.info("="*60)
     
     # Check if running in GitHub Actions (via environment variable)
     is_github_actions = os.getenv("GITHUB_ACTIONS") == "true"
