@@ -562,5 +562,77 @@
     "phone": "055-4518809",
     "token": "mvdccyni",
     "is_private": false
+  },
+  "https://www.yad2.co.il/item/66sik7eu": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 11,
+    "sqm": 100,
+    "phone": "053-7934431",
+    "token": "66sik7eu",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/0vjgs9qr": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "יעקב בן סירא",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 89,
+    "phone": "055-4361796",
+    "token": "0vjgs9qr",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/ay68rrp3": {
+    "price": 2290000,
+    "rooms": 3,
+    "street": "ירושלים",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 80,
+    "phone": "055-4360850",
+    "token": "ay68rrp3",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/a6nujqx5": {
+    "price": 2280000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "לא ידוע",
+    "city": "ראשון לציון",
+    "floor": 4,
+    "sqm": 91,
+    "phone": "055-4363123",
+    "token": "a6nujqx5",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/4lz4qurb": {
+    "price": 2250000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 15,
+    "sqm": 88,
+    "phone": "055-4525083",
+    "token": "4lz4qurb",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/txpr11yk": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 4,
+    "sqm": 90,
+    "phone": "055-4363392",
+    "token": "txpr11yk",
+    "is_private": false
   }
 }
