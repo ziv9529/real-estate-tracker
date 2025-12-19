@@ -79,6 +79,33 @@ WANTED_NEIGHBORHOODS = []
 SEEN_FILE = "seen.json"
 seen = {}
 
+# === Cache Files ===
+PHONE_CACHE_FILE = "phone_cache.json"
+phone_cache = {}
+
+def load_or_initialize_cache():
+    """Load cached phone numbers to avoid redundant API calls"""
+    global phone_cache
+    if os.path.exists(PHONE_CACHE_FILE):
+        try:
+            with open(PHONE_CACHE_FILE, "r", encoding="utf-8") as f:
+                phone_cache = json.load(f)
+            logger.info(f"Loaded {len(phone_cache)} cached phone numbers from {PHONE_CACHE_FILE}")
+        except Exception as e:
+            logger.warning(f"Failed to load phone cache: {e}. Starting fresh.")
+            phone_cache = {}
+    else:
+        logger.info(f"No existing phone cache found. Will create {PHONE_CACHE_FILE} as we fetch phone numbers.")
+
+def save_phone_cache():
+    """Save phone numbers to cache file"""
+    try:
+        with open(PHONE_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(phone_cache, f, indent=2, ensure_ascii=False)
+        logger.debug(f"Saved {len(phone_cache)} phone numbers to cache")
+    except Exception as e:
+        logger.error(f"Failed to save phone cache: {e}")
+
 def format_price(price):
     """Format price with commas (e.g., 2200000 -> 2,200,000)"""
     try:
@@ -117,16 +144,50 @@ def save_seen():
         json.dump(seen, f, indent=2, ensure_ascii=False)
     logger.debug(f"Saved {len(seen)} listings to {SEEN_FILE}")
 
-async def get_contact_info(client, ads_id):
-    """Fetch contact info from customer endpoint"""
-    try:
-        response = await client.get(f'https://gw.yad2.co.il/realestate-item/{ads_id}/customer')
-        data = await response.json()
-        phone = data.get("data", {}).get("brokerPhone") or data.get("data", {}).get("phone")
-        return phone
-    except Exception as e:
-        logger.debug(f"Failed to fetch phone for listing {ads_id}: {e}")
-        return None
+async def get_contact_info(client, ads_id, retry_count=3, delay=1):
+    """Fetch contact info from customer endpoint with retry logic and caching"""
+    # Check cache first
+    if ads_id in phone_cache:
+        logger.debug(f"Cache hit for {ads_id}: {phone_cache[ads_id]}")
+        return phone_cache[ads_id]
+    
+    for attempt in range(retry_count):
+        try:
+            response = await client.get(
+                f'https://gw.yad2.co.il/realestate-item/{ads_id}/customer',
+                timeout=15
+            )
+            data = await response.json()
+            phone = data.get("data", {}).get("brokerPhone") or data.get("data", {}).get("phone")
+            if phone:
+                logger.debug(f"Got phone for {ads_id}: {phone}")
+                # Save to cache
+                phone_cache[ads_id] = phone
+                save_phone_cache()
+            else:
+                logger.debug(f"Phone endpoint returned but no phone data for {ads_id}")
+                # Cache the "no phone" result
+                phone_cache[ads_id] = None
+                save_phone_cache()
+            return phone
+        except asyncio.TimeoutError:
+            if attempt < retry_count - 1:
+                logger.debug(f"Timeout fetching phone for {ads_id}, attempt {attempt + 1}/{retry_count}. Retrying...")
+                await asyncio.sleep(delay)
+            else:
+                logger.warning(f"Failed to fetch phone for {ads_id} after {retry_count} attempts (timeout)")
+        except Exception as e:
+            if attempt < retry_count - 1:
+                logger.debug(f"Error fetching phone for {ads_id}, attempt {attempt + 1}/{retry_count}: {e}. Retrying...")
+                await asyncio.sleep(delay)
+            else:
+                logger.warning(f"Failed to fetch phone for {ads_id} after {retry_count} attempts: {e}")
+    
+    logger.warning(f"⚠️  Listing {ads_id} has no phone number available")
+    # Cache the failure
+    phone_cache[ads_id] = None
+    save_phone_cache()
+    return None
 
 def extract_listing_data(item):
     """Extract relevant data from listing item"""
@@ -148,20 +209,17 @@ def extract_listing_data(item):
     }
 
 def is_possible_duplicate(new_item_data):
-    """Check if listing is a repost by the same seller"""
+    """Check if listing is a duplicate of an existing apartment (location + size match)"""
     for url, old in seen.items():
-        # Compare ALL attributes to identify the same apartment
+        # Compare key location and size attributes to find same apartment
+        # Don't require price to be different - we want to catch ALL duplicates
         if (
             old.get("city") == new_item_data.get("city")
             and old.get("neighborhood") == new_item_data.get("neighborhood")
             and old.get("street") == new_item_data.get("street")
             and old.get("floor") == new_item_data.get("floor")
             and old.get("rooms") == new_item_data.get("rooms")
-            and abs(old.get("sqm", 0) - new_item_data.get("sqm", 0)) <= 3
-            and old.get("price") != new_item_data.get("price")
-            and old.get("phone")
-            and new_item_data.get("phone")
-            and old.get("phone") == new_item_data.get("phone")
+            and abs(old.get("sqm", 0) - new_item_data.get("sqm", 0)) <= 3  # ±3 sqm tolerance
         ):
             return url, old
     return None, None
@@ -267,6 +325,10 @@ async def check_yad2_listings():
                 item_data = extract_listing_data(item)
                 item_data["phone"] = phone
                 
+                # Small delay between requests to avoid rate limiting
+                if index < len(all_listings):
+                    await asyncio.sleep(0.3)
+                
                 url = f"https://www.yad2.co.il/item/{token}"
                 
                 price = item_data["price"]
@@ -302,18 +364,27 @@ async def check_yad2_listings():
                     # New listing - check if it's a duplicate repost
                     old_url, old_data = is_possible_duplicate(item_data)
                     if old_url:
-                        message = (
-                            f"🔁 יתכן שזו אותה דירה שפורסמה מחדש ע\"י אותו מפרסם:\n"
-                            f"עיר: {city}\nרחוב: {street}\nשכונה: {neighborhood}\nקומה: {floor}\nחדרים: {rooms}\nמ\"ר: {sqm}\n"
-                            f"מחיר קודם: {format_price(old_data['price'])} ₪\n"
-                            f"מחיר חדש: {format_price(price)} ₪\n"
-                            f"טלפון: {phone_str}\n"
-                            f"קישור חדש: {url}\n"
-                            f"קישור קודם: {old_url}"
-                        )
-                        logger.info(f"Potential repost detected: {street} - {phone_str}")
-                        send_telegram(message)
+                        # This is a duplicate apartment - check if price changed
+                        price_changed = old_data.get("price") != price
+                        
+                        if price_changed:
+                            # Duplicate with price change
+                            message = (
+                                f"🔁 יתכן שזו אותה דירה שפורסמה מחדש ע\"י אותו מפרסם:\n"
+                                f"עיר: {city}\nרחוב: {street}\nשכונה: {neighborhood}\nקומה: {floor}\nחדרים: {rooms}\nמ\"ר: {sqm}\n"
+                                f"מחיר קודם: {format_price(old_data['price'])} ₪\n"
+                                f"מחיר חדש: {format_price(price)} ₪\n"
+                                f"טלפון: {phone_str}\n"
+                                f"קישור חדש: {url}\n"
+                                f"קישור קודם: {old_url}"
+                            )
+                            logger.info(f"Potential repost with price change detected: {street}")
+                            send_telegram(message)
+                        else:
+                            # Same apartment, same price - don't send a message, just log
+                            logger.info(f"Duplicate listing (same apartment, same price): {street} - {price}₪")
                     else:
+                        # Truly new listing - send new apartment alert
                         # Build neighborhood line only if it's not "לא ידוע"
                         neighborhood_line = f"שכונה: {neighborhood}, " if neighborhood != "לא ידוע" else ""
                         # Determine if private or agency
@@ -344,6 +415,7 @@ async def main_loop(check_interval: int = 120, run_once: bool = False):
     """Main monitoring loop - runs both searches"""
     global API_PARAMS
     load_or_initialize_seen()
+    load_or_initialize_cache()  # Load cached phone numbers
     
     # Initial load - don't send alerts on first run
     if len(seen) == 0:
@@ -377,23 +449,29 @@ async def main_loop(check_interval: int = 120, run_once: bool = False):
             logger.exception(f"Error during check cycle: {e}")
     else:
         logger.info(f"Starting monitoring loop (checking every {check_interval} seconds)")
-        while True:
-            try:
-                # Run Search 1: 3-3.5 rooms
-                logger.info("Running Search 1: 3-3.5 rooms")
-                API_PARAMS = API_PARAMS_SEARCH_1
-                await check_yad2_listings()
+        try:
+            while True:
+                try:
+                    # Run Search 1: 3-3.5 rooms
+                    logger.info("Running Search 1: 3-3.5 rooms")
+                    API_PARAMS = API_PARAMS_SEARCH_1
+                    await check_yad2_listings()
+                    
+                    await asyncio.sleep(10)
+                    
+                    # Run Search 2: 4-4.5 rooms
+                    logger.info("Running Search 2: 4-4.5 rooms")
+                    API_PARAMS = API_PARAMS_SEARCH_2
+                    await check_yad2_listings()
+                except Exception as e:
+                    logger.exception(f"Error during check cycle: {e}")
                 
-                await asyncio.sleep(10)
-                
-                # Run Search 2: 4-4.5 rooms
-                logger.info("Running Search 2: 4-4.5 rooms")
-                API_PARAMS = API_PARAMS_SEARCH_2
-                await check_yad2_listings()
-            except Exception as e:
-                logger.exception(f"Error during check cycle: {e}")
-            
-            await asyncio.sleep(check_interval)
+                await asyncio.sleep(check_interval)
+        except KeyboardInterrupt:
+            logger.info("Received Ctrl+C - shutting down gracefully...")
+            save_seen()
+            save_phone_cache()
+            logger.info("Cache saved. Goodbye!")
 
 if __name__ == "__main__":
     from sys import platform
@@ -405,9 +483,13 @@ if __name__ == "__main__":
     # Check if running in GitHub Actions (via environment variable)
     is_github_actions = os.getenv("GITHUB_ACTIONS") == "true"
     
-    if is_github_actions:
-        logger.info("Running in GitHub Actions - single run mode")
-        asyncio.run(main_loop(run_once=True))
-    else:
-        logger.info("Running locally - continuous loop mode (every 120 seconds)")
-        asyncio.run(main_loop(check_interval=120, run_once=False))
+    try:
+        if is_github_actions:
+            logger.info("Running in GitHub Actions - single run mode")
+            asyncio.run(main_loop(run_once=True))
+        else:
+            logger.info("Running locally - continuous loop mode (every 120 seconds)")
+            asyncio.run(main_loop(check_interval=120, run_once=False))
+    except KeyboardInterrupt:
+        logger.info("\nKeyboardInterrupt caught at main level - exiting")
+        exit(0)
