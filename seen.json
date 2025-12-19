@@ -158,5 +158,15 @@
     "sqm": 90,
     "phone": null,
     "token": "txpr11yk"
+  },
+  "https://www.yad2.co.il/item/apwh2nf5": {
+    "price": 2150000,
+    "rooms": 3,
+    "street": "דודו דותן",
+    "neighborhood": "הרקפות",
+    "floor": 6,
+    "sqm": 88,
+    "phone": null,
+    "token": "apwh2nf5"
   }
 }
