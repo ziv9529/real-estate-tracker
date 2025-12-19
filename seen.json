@@ -168,5 +168,15 @@
     "sqm": 88,
     "phone": null,
     "token": "apwh2nf5"
+  },
+  "https://www.yad2.co.il/item/mvdccyni": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "הצבר",
+    "neighborhood": "נרקיסים",
+    "floor": 6,
+    "sqm": 80,
+    "phone": null,
+    "token": "mvdccyni"
   }
 }
