@@ -490,5 +490,89 @@
     "phone": "055-4368579",
     "token": "g5zpi21a",
     "is_private": false
+  },
+  "https://www.yad2.co.il/item/1c7lebi6": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 9,
+    "sqm": 92,
+    "phone": null,
+    "token": "1c7lebi6",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/apwh2nf5": {
+    "price": 2150000,
+    "rooms": 3,
+    "street": "דודו דותן",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 6,
+    "sqm": 88,
+    "phone": null,
+    "token": "apwh2nf5",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/kg9tbhv0": {
+    "price": 2250000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 5,
+    "sqm": 92,
+    "phone": null,
+    "token": "kg9tbhv0",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/z4szmk7y": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 92,
+    "phone": null,
+    "token": "z4szmk7y",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/13tjiov7": {
+    "price": 2265000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 8,
+    "sqm": 93,
+    "phone": null,
+    "token": "13tjiov7",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/ok82pyvc": {
+    "price": 2150000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 9,
+    "sqm": 93,
+    "phone": null,
+    "token": "ok82pyvc",
+    "is_private": false
+  },
+  "https://www.yad2.co.il/item/ay68rrp3": {
+    "price": 2290000,
+    "rooms": 3,
+    "street": "ירושלים",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 80,
+    "phone": null,
+    "token": "ay68rrp3",
+    "is_private": false
   }
 }
