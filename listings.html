@@ -1,473 +1,1336 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yad2 Listings - Live View</title>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yad2 הנכסים - צפייה חיה</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        h1 {
-            color: white;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        .info {
-            color: rgba(255,255,255,0.9);
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 1.1em;
-        }
-        .search-info {
-            background: rgba(255,255,255,0.1);
-            border-left: 4px solid #3498db;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 0.95em;
-            line-height: 1.6;
-        }
-        .search-info-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #fff;
-        }
-        .search-info-item {
-            margin-bottom: 6px;
-            padding-left: 20px;
-            position: relative;
-        }
-        .search-info-item:before {
-            content: "▶";
-            position: absolute;
-            left: 0;
-            color: #3498db;
-        }
-        .stats {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-        .stat {
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 1.8em;
-            font-weight: bold;
-        }
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-        .stat-sublabel {
-            font-size: 0.8em;
-            opacity: 0.7;
-            margin-top: 4px;
-        }
-        .filters-section {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-        .filters-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-        }
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .filter-label {
-            font-size: 0.9em;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 6px;
-        }
-        .filter-input, .filter-select {
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.95em;
-            transition: border-color 0.2s ease;
-        }
-        .filter-input:focus, .filter-select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        .filter-options {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 150px;
-            overflow-y: auto;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background: #fafafa;
-        }
-        .filter-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .filter-option input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: #667eea;
-        }
-        .filter-option label {
-            cursor: pointer;
-            font-size: 0.95em;
-            color: #333;
-            flex: 1;
-        }
-        .filter-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            grid-column: 1 / -1;
-        }
-        .btn-filter {
-            flex: 1;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            font-size: 0.95em;
-        }
-        .btn-apply {
-            background-color: #2ecc71;
-            color: white;
-        }
-        .btn-apply:hover {
-            background-color: #27ae60;
-        }
-        .btn-clear {
-            background-color: #e74c3c;
-            color: white;
-        }
-        .btn-clear:hover {
-            background-color: #c0392b;
-        }
-        .results-info {
-            color: white;
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 1.05em;
-        }
-        .listings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-        }
-        .listing-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .listing-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-        }
-        .image-container {
-            position: relative;
-            width: 100%;
-            height: 240px;
-            background: #f0f0f0;
-            overflow: hidden;
-        }
-        .listing-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-        .listing-card:hover .listing-image {
-            transform: scale(1.05);
-        }
-        .no-image {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #999;
-            font-size: 0.9em;
-        }
-        .listing-content {
-            padding: 16px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .price {
-            font-size: 1.6em;
-            font-weight: bold;
-            color: #2ecc71;
-            margin-bottom: 10px;
-        }
-        .details {
-            font-size: 0.95em;
-            color: #333;
-            margin-bottom: 12px;
-            line-height: 1.6;
-        }
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6px;
-        }
-        .detail-label {
-            font-weight: 600;
-            color: #555;
-        }
-        .detail-value {
-            color: #777;
-            text-align: right;
-        }
-        .footer {
-            display: flex;
-            gap: 8px;
-            margin-top: auto;
-            padding-top: 12px;
-            border-top: 1px solid #eee;
-        }
-        .btn {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.9em;
-            font-weight: 600;
-            transition: background-color 0.2s ease;
-            display: inline-block;
-        }
-        .btn-link {
-            background-color: #3498db;
-            color: white;
-        }
-        .btn-link:hover {
-            background-color: #2980b9;
-        }
-        .btn-phone {
-            background-color: #e74c3c;
-            color: white;
-        }
-        .btn-phone:hover {
-            background-color: #c0392b;
-        }
-        .type-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-top: 8px;
-            margin-bottom: 8px;
-        }
-        .type-private {
-            background-color: #f39c12;
-            color: white;
-        }
-        .type-agency {
-            background-color: #9b59b6;
-            color: white;
-        }
-        .no-results {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            text-align: center;
-            color: #666;
-            font-size: 1.1em;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      h1 {
+        color: white;
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .info {
+        color: rgba(255, 255, 255, 0.9);
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.1em;
+      }
+      .search-info {
+        background: rgba(255, 255, 255, 0.1);
+        border-left: 4px solid #3498db;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-size: 0.95em;
+        line-height: 1.6;
+      }
+      .search-info-title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #fff;
+      }
+      .search-info-item {
+        margin-bottom: 6px;
+        padding-left: 20px;
+        position: relative;
+      }
+      .search-info-item:before {
+        content: "▶";
+        position: absolute;
+        left: 0;
+        color: #3498db;
+      }
+      .stats {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+      }
+      .stat {
+        text-align: center;
+      }
+      .stat-value {
+        font-size: 1.8em;
+        font-weight: bold;
+      }
+      .stat-label {
+        font-size: 0.9em;
+        opacity: 0.9;
+      }
+      .stat-sublabel {
+        font-size: 0.8em;
+        opacity: 0.7;
+        margin-top: 4px;
+      }
+      .filters-section {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+      .filters-title {
+        font-size: 1.2em;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+      }
+      .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+      }
+      .filter-label {
+        font-size: 0.9em;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 6px;
+      }
+      .filter-input,
+      .filter-select {
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.95em;
+        transition: border-color 0.2s ease;
+      }
+      .filter-input:focus,
+      .filter-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+      .filter-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 150px;
+        overflow-y: auto;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #fafafa;
+      }
+      .filter-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .filter-option input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #667eea;
+      }
+      .filter-option label {
+        cursor: pointer;
+        font-size: 0.95em;
+        color: #333;
+        flex: 1;
+      }
+      .filter-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        grid-column: 1 / -1;
+      }
+      .btn-filter {
+        flex: 1;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-size: 0.95em;
+      }
+      .btn-apply {
+        background-color: #2ecc71;
+        color: white;
+      }
+      .btn-apply:hover {
+        background-color: #27ae60;
+      }
+      .btn-clear {
+        background-color: #e74c3c;
+        color: white;
+      }
+      .btn-clear:hover {
+        background-color: #c0392b;
+      }
+      .results-info {
+        color: white;
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 1.05em;
+      }
+      .listings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+      }
+      .listing-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .listing-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      }
+      .image-container {
+        position: relative;
+        width: 100%;
+        height: 240px;
+        background: #f0f0f0;
+        overflow: hidden;
+      }
+      .listing-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+      .listing-card:hover .listing-image {
+        transform: scale(1.05);
+      }
+      .no-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #999;
+        font-size: 0.9em;
+      }
+      .listing-content {
+        padding: 16px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .price {
+        font-size: 1.6em;
+        font-weight: bold;
+        color: #2ecc71;
+        margin-bottom: 10px;
+      }
+      .details {
+        font-size: 0.95em;
+        color: #333;
+        margin-bottom: 12px;
+        line-height: 1.6;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+      .detail-label {
+        font-weight: 600;
+        color: #555;
+      }
+      .detail-value {
+        color: #777;
+        text-align: right;
+      }
+      .footer {
+        display: flex;
+        gap: 8px;
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid #eee;
+      }
+      .btn {
+        flex: 1;
+        padding: 10px;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 0.9em;
+        font-weight: 600;
+        transition: background-color 0.2s ease;
+        display: inline-block;
+      }
+      .btn-link {
+        background-color: #3498db;
+        color: white;
+      }
+      .btn-link:hover {
+        background-color: #2980b9;
+      }
+      .btn-phone {
+        background-color: #e74c3c;
+        color: white;
+      }
+      .btn-phone:hover {
+        background-color: #c0392b;
+      }
+      .type-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 600;
+        margin-top: 8px;
+        margin-bottom: 8px;
+      }
+      .type-private {
+        background-color: #f39c12;
+        color: white;
+      }
+      .type-agency {
+        background-color: #9b59b6;
+        color: white;
+      }
+      .no-results {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        text-align: center;
+        color: #666;
+        font-size: 1.1em;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>🏠 Yad2 Listings</h1>
-        <div class="info">Last updated: 2025-12-20 19:13:59</div>
-        
-        <div class="search-info">
-            <div class="search-info-title">📋 Active Searches</div>
-            <div class="search-info-item"><strong>Search 1:</strong> 3-3.5 rooms | 70+ sqm | Max ₪2,350,000</div>
-            <div class="search-info-item"><strong>Search 2:</strong> 4-4.5 rooms | 85+ sqm | Max ₪2,700,000</div>
-        </div>
-        
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-value">55</div>
-                <div class="stat-label">Total Listings</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">₪ 2,278,675</div>
-                <div class="stat-label">Average Price</div>
-                <div class="stat-sublabel">3-3.5 Rooms (40)</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">₪ 2,622,000</div>
-                <div class="stat-label">Average Price</div>
-                <div class="stat-sublabel">4-4.5 Rooms (15)</div>
-            </div>
-        </div>
+      <h1>🏠 הנכסים ברשת יד2</h1>
+      <div class="info">עדכון אחרון: 2025-12-20 21:15:34</div>
 
-        <div class="filters-section">
-            <div class="filters-title">🔍 Filters & Sort</div>
-            <div class="filters-grid">
-                <div class="filter-group">
-                    <label class="filter-label">Rooms</label>
-                    <div class="filter-options" id="roomsFilterContainer">
-                        <div class="filter-option"><input type="checkbox" id="rooms_0" value="3" class="rooms-checkbox"><label for="rooms_0">3 rooms</label></div>
-                        <div class="filter-option"><input type="checkbox" id="rooms_1" value="4" class="rooms-checkbox"><label for="rooms_1">4 rooms</label></div>
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Neighborhood</label>
-                    <div class="filter-options" id="neighborhoodFilterContainer">
-                        <div class="filter-option"><input type="checkbox" id="neighborhood_0" value="הרקפות" class="neighborhood-checkbox"><label for="neighborhood_0">הרקפות</label></div>
-                        <div class="filter-option"><input type="checkbox" id="neighborhood_1" value="נוריות" class="neighborhood-checkbox"><label for="neighborhood_1">נוריות</label></div>
-                        <div class="filter-option"><input type="checkbox" id="neighborhood_2" value="נחלת יהודה" class="neighborhood-checkbox"><label for="neighborhood_2">נחלת יהודה</label></div>
-                        <div class="filter-option"><input type="checkbox" id="neighborhood_3" value="נרקיסים" class="neighborhood-checkbox"><label for="neighborhood_3">נרקיסים</label></div>
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">City</label>
-                    <div class="filter-options" id="cityFilterContainer">
-                        <div class="filter-option"><input type="checkbox" id="city_0" value="ראשון לציון" class="city-checkbox"><label for="city_0">ראשון לציון</label></div>
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Type</label>
-                    <div class="filter-options">
-                        <div class="filter-option"><input type="checkbox" id="type_0" value="Private" class="type-checkbox"><label for="type_0">Private</label></div>
-                        <div class="filter-option"><input type="checkbox" id="type_1" value="Agency" class="type-checkbox"><label for="type_1">Agency</label></div>
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Sort by Price</label>
-                    <select class="filter-select" id="priceSort">
-                        <option value="">None</option>
-                        <option value="desc">Highest First</option>
-                        <option value="asc" selected>Lowest First</option>
-                    </select>
-                </div>
-                <div class="filter-buttons">
-                    <button class="btn-filter btn-apply" onclick="applyFilters()">Apply Filters</button>
-                    <button class="btn-filter btn-clear" onclick="clearFilters()">Clear All</button>
-                </div>
-            </div>
+      <div class="search-info">
+        <div class="search-info-title">📋 חיפושים פעילים</div>
+        <div class="search-info-item">
+          <strong>חיפוש 1:</strong> חדרים 3-3.5 | 70+ מ'ר | מחיר מקס ₪2,350,000
         </div>
+        <div class="search-info-item">
+          <strong>חיפוש 2:</strong> חדרים 4-4.5 | 85+ מ'ר | מחיר מקס ₪2,700,000
+        </div>
+      </div>
 
-        <div class="results-info" id="resultsInfo"></div>
-        <div class="listings-grid" id="listingsGrid">
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value">55</div>
+          <div class="stat-label">סה"כ נכסים</div>
         </div>
+        <div class="stat">
+          <div class="stat-value">₪ 2,278,675</div>
+          <div class="stat-label">מחיר ממוצע</div>
+          <div class="stat-sublabel">חדרים 3-3.5 (40)</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">₪ 2,622,000</div>
+          <div class="stat-label">מחיר ממוצע</div>
+          <div class="stat-sublabel">חדרים 4-4.5 (15)</div>
+        </div>
+      </div>
+
+      <div class="filters-section">
+        <div class="filters-title">🔍 סינונים ומיון</div>
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label class="filter-label">מספר חדרים</label>
+            <div class="filter-options" id="roomsFilterContainer">
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  id="rooms_0"
+                  value="3"
+                  class="rooms-checkbox"
+                /><label for="rooms_0">3 חדרים</label>
+              </div>
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  id="rooms_1"
+                  value="4"
+                  class="rooms-checkbox"
+                /><label for="rooms_1">4 חדרים</label>
+              </div>
+            </div>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">שכונה</label>
+            <div class="filter-options" id="neighborhoodFilterContainer">
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  id="neighborhood_0"
+                  value="הרקפות"
+                  class="neighborhood-checkbox"
+                /><label for="neighborhood_0">הרקפות</label>
+              </div>
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  id="neighborhood_1"
+                  value="נוריות"
+                  class="neighborhood-checkbox"
+                /><label for="neighborhood_1">נוריות</label>
+              </div>
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  id="neighborhood_2"
+                  value="נחלת יהודה"
+                  class="neighborhood-checkbox"
+                /><label for="neighborhood_2">נחלת יהודה</label>
+              </div>
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  id="neighborhood_3"
+                  value="נרקיסים"
+                  class="neighborhood-checkbox"
+                /><label for="neighborhood_3">נרקיסים</label>
+              </div>
+            </div>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">עיר</label>
+            <div class="filter-options" id="cityFilterContainer">
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  id="city_0"
+                  value="ראשון לציון"
+                  class="city-checkbox"
+                /><label for="city_0">ראשון לציון</label>
+              </div>
+            </div>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">סוג</label>
+            <div class="filter-options">
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  id="type_0"
+                  value="Private"
+                  class="type-checkbox"
+                /><label for="type_0">פרטי</label>
+              </div>
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  id="type_1"
+                  value="Agency"
+                  class="type-checkbox"
+                /><label for="type_1">חברה</label>
+              </div>
+            </div>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">מיון לפי מחיר</label>
+            <select class="filter-select" id="priceSort">
+              <option value="">ללא מיון</option>
+              <option value="desc">יקר ביותר</option>
+              <option value="asc" selected>זול ביותר</option>
+            </select>
+          </div>
+          <div class="filter-buttons">
+            <button class="btn-filter btn-apply" onclick="applyFilters()">
+              החל סינונים
+            </button>
+            <button class="btn-filter btn-clear" onclick="clearFilters()">
+              נקה הכל
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-info" id="resultsInfo"></div>
+      <div class="listings-grid" id="listingsGrid"></div>
     </div>
 
     <script>
-        const allListings = [{"URL": "https://www.yad2.co.il/item/8jog0kcc", "Price (\u20aa)": 2690000, "Rooms": 4, "Street": "\u05d0\u05d5\u05e8\u05e0\u05d4 \u05e4\u05d5\u05e8\u05ea", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 5, "SqM": 120, "Phone": "055-2129795", "Type": "Private", "Image URL": "https://img.yad2.co.il/Pic/202512/14/2_1/o/y2_1pa_010926_20251214180530.jpeg"}, {"URL": "https://www.yad2.co.il/item/duvn5q5r", "Price (\u20aa)": 2680000, "Rooms": 4, "Street": "\u05d0\u05e8\u05d9\u05e7 \u05d0\u05d9\u05d9\u05e0\u05e9\u05d8\u05d9\u05d9\u05df", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 3, "SqM": 107, "Phone": "050-7613337", "Type": "Private", "Image URL": "https://img.yad2.co.il/Pic/202512/09/2_1/o/y2_1pa_010571_20251209100809.jpeg"}, {"URL": "https://www.yad2.co.il/item/zr8nsk4i", "Price (\u20aa)": 2680000, "Rooms": 4, "Street": "\u05d0\u05d5\u05e8\u05e0\u05d4 \u05e4\u05d5\u05e8\u05ea", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 3, "SqM": 120, "Phone": "055-2121047", "Type": "Private", "Image URL": "https://img.yad2.co.il/Pic/202512/15/2_1/o/y2_1_02588_20251215135533.jpeg"}, {"URL": "https://www.yad2.co.il/item/xg7f26mi", "Price (\u20aa)": 2660000, "Rooms": 4, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 4, "SqM": 120, "Phone": "055-4369819", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202411/28/2_5/o/y2_5_RI6O2X0qny_20241128.jpg"}, {"URL": "https://www.yad2.co.il/item/p7a10czj", "Price (\u20aa)": 2650000, "Rooms": 4, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 5, "SqM": 120, "Phone": "055-4369819", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202509/08/2_5/o/y2_1pa_010884_20250908145746.jpeg"}, {"URL": "https://www.yad2.co.il/item/r4fgtpa9", "Price (\u20aa)": 2650000, "Rooms": 4, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 5, "SqM": 120, "Phone": "055-4369819", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202509/08/2_5/o/y2_1pa_010816_20250908152941.jpeg"}, {"URL": "https://www.yad2.co.il/item/3pt44j5f", "Price (\u20aa)": 2650000, "Rooms": 4, "Street": "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 10, "SqM": 124, "Phone": "055-4367372", "Type": "Agency", "Image URL": null}, {"URL": "https://www.yad2.co.il/item/649ci32h", "Price (\u20aa)": 2640000, "Rooms": 4, "Street": "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 2, "SqM": 102, "Phone": "055-2126073", "Type": "Private", "Image URL": "https://img.yad2.co.il/Pic/202511/25/2_1/o/y2_1pa_010337_20251125062658.jpeg"}, {"URL": "https://www.yad2.co.il/item/nfm52nzt", "Price (\u20aa)": 2590000, "Rooms": 4, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 5, "SqM": 119, "Phone": "055-4367481", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202506/23/2_5/o/y2_2_3u6kmDonEx_20250623.jpeg"}, {"URL": "https://www.yad2.co.il/item/ylh7gb0k", "Price (\u20aa)": 2590000, "Rooms": 4, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 5, "SqM": 120, "Phone": "053-7934431", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202506/15/2_5/o/y2_1pa_010210_20250615005855.jpeg"}, {"URL": "https://www.yad2.co.il/item/yukl2dmn", "Price (\u20aa)": 2585000, "Rooms": 4, "Street": "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 3, "SqM": 117, "Phone": "055-4367372", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202508/25/2_5/o/y2_1pa_010929_20250825224917.jpeg"}, {"URL": "https://www.yad2.co.il/item/pbb9vivv", "Price (\u20aa)": 2585000, "Rooms": 4, "Street": "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 3, "SqM": 117, "Phone": "055-4367372", "Type": "Agency", "Image URL": null}, {"URL": "https://www.yad2.co.il/item/rc4h3iih", "Price (\u20aa)": 2580000, "Rooms": 4, "Street": "\u05d0\u05e8\u05d9\u05e7 \u05d0\u05d9\u05d9\u05e0\u05e9\u05d8\u05d9\u05d9\u05df", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 3, "SqM": 107, "Phone": "052-4754966", "Type": "Private", "Image URL": "https://img.yad2.co.il/Pic/202511/09/2_1/o/y2_1pa_010225_20251109215404.jpeg"}, {"URL": "https://www.yad2.co.il/item/42wn2ues", "Price (\u20aa)": 2550000, "Rooms": 4, "Street": "\u05d0\u05d5\u05e8\u05e0\u05d4 \u05e4\u05d5\u05e8\u05ea", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 2, "SqM": 120, "Phone": "055-4369816", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202408/18/2_5/o/y2_1pa_010885_20240818104643.jpeg"}, {"URL": "https://www.yad2.co.il/item/3ytmq5mg", "Price (\u20aa)": 2550000, "Rooms": 4, "Street": "\u05d0\u05d5\u05e8\u05e0\u05d4 \u05e4\u05d5\u05e8\u05ea", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 4, "SqM": 120, "Phone": "055-4369816", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202408/04/2_5/o/y2_1pa_010563_20240804103050.jpeg"}, {"URL": "https://www.yad2.co.il/item/aofphzwh", "Price (\u20aa)": 2350000, "Rooms": 3, "Street": "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 8, "SqM": 92, "Phone": "052-4545794", "Type": "Private", "Image URL": "https://img.yad2.co.il/Pic/202505/03/2_1/o/y2_1_07874_20250503220201.jpeg"}, {"URL": "https://www.yad2.co.il/item/h7ya6c5s", "Price (\u20aa)": 2350000, "Rooms": 3, "Street": "\u05d9\u05e8\u05d5\u05e9\u05dc\u05d9\u05dd", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 8, "SqM": 92, "Phone": "055-2126467", "Type": "Private", "Image URL": "https://img.yad2.co.il/Pic/202511/24/2_1/o/y2_1pa_010623_20251124213239.jpeg"}, {"URL": "https://www.yad2.co.il/item/sf75r2uq", "Price (\u20aa)": 2350000, "Rooms": 3, "Street": "\u05e9\u05dc\u05de\u05d4 \u05dc\u05d5\u05d9", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 12, "SqM": 90, "Phone": "055-4308354", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202512/15/2_5/o/y2_1pa_010139_20251215154410.jpeg"}, {"URL": "https://www.yad2.co.il/item/1c7lebi6", "Price (\u20aa)": 2350000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 9, "SqM": 92, "Phone": "055-4363392", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202508/18/2_5/o/y2_3_oLavcu4ngv_20250818.png"}, {"URL": "https://www.yad2.co.il/item/z4szmk7y", "Price (\u20aa)": 2350000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 2, "SqM": 92, "Phone": "055-4363392", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202503/04/2_5/o/y2_3_AsGr0X1tS2_20250304.jpg"}, {"URL": "https://www.yad2.co.il/item/4hk9ogl1", "Price (\u20aa)": 2350000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 3, "SqM": 92, "Phone": null, "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202505/05/2_5/o/y2_8_kZzNxzaTxU_20250505.jpg"}, {"URL": "https://www.yad2.co.il/item/201bgvr5", "Price (\u20aa)": 2350000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 3, "SqM": 93, "Phone": null, "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202508/26/2_5/o/y2_1pa_010346_20250826221832.jpeg"}, {"URL": "https://www.yad2.co.il/item/mvdccyni", "Price (\u20aa)": 2350000, "Rooms": 3, "Street": "\u05d4\u05e6\u05d1\u05e8", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 6, "SqM": 80, "Phone": "055-4518809", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202507/30/2_5/o/y2_1pa_010240_20250730160555.jpeg"}, {"URL": "https://www.yad2.co.il/item/66sik7eu", "Price (\u20aa)": 2350000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 11, "SqM": 100, "Phone": "053-7934431", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202507/06/2_5/o/y2_1pa_010835_20250706003338.jpeg"}, {"URL": "https://www.yad2.co.il/item/0vjgs9qr", "Price (\u20aa)": 2350000, "Rooms": 3, "Street": "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 2, "SqM": 89, "Phone": "055-4361796", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202303/27/2_5/o/y2_1_997723_20230327.jpg"}, {"URL": "https://www.yad2.co.il/item/txpr11yk", "Price (\u20aa)": 2350000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 4, "SqM": 90, "Phone": "055-4363392", "Type": "Agency", "Image URL": ""}, {"URL": "https://www.yad2.co.il/item/sk6a8c73", "Price (\u20aa)": 2340000, "Rooms": 3, "Street": "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 4, "SqM": 88, "Phone": "054-9762561", "Type": "Private", "Image URL": "https://img.yad2.co.il/Pic/202511/10/2_1/o/y2_1pa_010391_20251110104046.jpeg"}, {"URL": "https://www.yad2.co.il/item/wu158yck", "Price (\u20aa)": 2325000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 2, "SqM": 90, "Phone": "055-4363392", "Type": "Agency", "Image URL": ""}, {"URL": "https://www.yad2.co.il/item/0nk44bko", "Price (\u20aa)": 2300000, "Rooms": 3, "Street": "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 6, "SqM": 90, "Phone": "055-2110115", "Type": "Private", "Image URL": "https://img.yad2.co.il/Pic/202507/14/2_1/o/y2_1pa_010842_20250714222002.jpeg"}, {"URL": "https://www.yad2.co.il/item/hpqvpv84", "Price (\u20aa)": 2300000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 5, "SqM": 92, "Phone": "055-4363392", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202510/26/2_5/o/y2_7_mrbMgXE_999988_20251026.jpeg"}, {"URL": "https://www.yad2.co.il/item/xrkrr8yy", "Price (\u20aa)": 2299000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 3, "SqM": 90, "Phone": "055-4523584", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202511/23/2_5/o/y2_9_X90uMhsAn1_20251123.jpeg"}, {"URL": "https://www.yad2.co.il/item/sw7cyuw7", "Price (\u20aa)": 2290000, "Rooms": 3, "Street": "\u05d0\u05d5\u05e8\u05e0\u05d4 \u05e4\u05d5\u05e8\u05ea", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 5, "SqM": 75, "Phone": "055-4361115", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202510/06/2_5/o/y2_1pa_010629_20251006130613.jpeg"}, {"URL": "https://www.yad2.co.il/item/z2vy5asn", "Price (\u20aa)": 2290000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 2, "SqM": 93, "Phone": "055-4367481", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202510/28/2_5/o/y2_2_Zjq8gx9o3L_20251028.jpeg"}, {"URL": "https://www.yad2.co.il/item/68k92evo", "Price (\u20aa)": 2290000, "Rooms": 3, "Street": "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 11, "SqM": 85, "Phone": "055-4367998", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202510/05/2_5/o/y2_9_KCvPqQvhtz_20251005.jpg"}, {"URL": "https://www.yad2.co.il/item/g5zpi21a", "Price (\u20aa)": 2290000, "Rooms": 3, "Street": "\u05e9\u05d5\u05dc\u05de\u05d9\u05ea \u05d0\u05dc\u05d5\u05e0\u05d9", "Neighborhood": "\u05e0\u05d7\u05dc\u05ea \u05d9\u05d4\u05d5\u05d3\u05d4", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 8, "SqM": 82, "Phone": "055-4368579", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202507/16/2_5/o/y2_1pa_010979_20250716220542.jpeg"}, {"URL": "https://www.yad2.co.il/item/5vzia1vx", "Price (\u20aa)": 2290000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05d5\u05e8\u05d9\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 10, "SqM": 86, "Phone": "055-4559813", "Type": "Agency", "Image URL": ""}, {"URL": "https://www.yad2.co.il/item/ay68rrp3", "Price (\u20aa)": 2290000, "Rooms": 3, "Street": "\u05d9\u05e8\u05d5\u05e9\u05dc\u05d9\u05dd", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 3, "SqM": 80, "Phone": "055-4360850", "Type": "Agency", "Image URL": ""}, {"URL": "https://www.yad2.co.il/item/a6nujqx5", "Price (\u20aa)": 2280000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 4, "SqM": 91, "Phone": "055-4363123", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202511/26/2_5/o/y2_1pa_010528_20251126135019.jpeg"}, {"URL": "https://www.yad2.co.il/item/slrlj7ic", "Price (\u20aa)": 2270000, "Rooms": 3, "Street": "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 17, "SqM": 88, "Phone": "055-4525083", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202512/03/2_5/o/y2_1_lqA178tj7G_20251203.jpeg"}, {"URL": "https://www.yad2.co.il/item/tghi697z", "Price (\u20aa)": 2270000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 4, "SqM": 86, "Phone": "055-4367481", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202505/19/2_5/o/y2_5_fIrT83EHaf_20250519.jpeg"}, {"URL": "https://www.yad2.co.il/item/13tjiov7", "Price (\u20aa)": 2265000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 8, "SqM": 93, "Phone": "055-4363392", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202509/09/2_5/o/y2_7_EWuHOOgS0S_20250909.png"}, {"URL": "https://www.yad2.co.il/item/5pit9jya", "Price (\u20aa)": 2250000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 6, "SqM": 90, "Phone": "055-4363392", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202507/30/2_5/o/y2_3_fQiOYSRtFz_20250730.jpeg"}, {"URL": "https://www.yad2.co.il/item/314v5h7z", "Price (\u20aa)": 2250000, "Rooms": 3, "Street": "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 3, "SqM": 90, "Phone": "053-2447866", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202509/02/2_5/o/y2_1pa_010831_20250902121842.jpeg"}, {"URL": "https://www.yad2.co.il/item/kg9tbhv0", "Price (\u20aa)": 2250000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 5, "SqM": 92, "Phone": "055-4363392", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202508/21/2_5/o/y2_1pa_010638_20250821141256.jpeg"}, {"URL": "https://www.yad2.co.il/item/4lz4qurb", "Price (\u20aa)": 2250000, "Rooms": 3, "Street": "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 15, "SqM": 88, "Phone": "055-4525083", "Type": "Agency", "Image URL": ""}, {"URL": "https://www.yad2.co.il/item/926ukemm", "Price (\u20aa)": 2240000, "Rooms": 3, "Street": "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 2, "SqM": 88, "Phone": "055-4307200", "Type": "Agency", "Image URL": ""}, {"URL": "https://www.yad2.co.il/item/iq13yfen", "Price (\u20aa)": 2230000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 16, "SqM": 90, "Phone": "053-6310312", "Type": "Agency", "Image URL": null}, {"URL": "https://www.yad2.co.il/item/cl0ypx01", "Price (\u20aa)": 2200000, "Rooms": 3, "Street": "\u05d4\u05dc\u05d5\u05d7\u05de\u05d5\u05ea", "Neighborhood": "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 2, "SqM": 90, "Phone": "055-4528217", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202507/15/2_5/o/y2_1pa_010077_20250715130040.jpeg"}, {"URL": "https://www.yad2.co.il/item/rmgn3zps", "Price (\u20aa)": 2200000, "Rooms": 3, "Street": "\u05d0\u05dc\u05d9 \u05d9\u05d1\u05dc\u05d5\u05df", "Neighborhood": "\u05e0\u05d5\u05e8\u05d9\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 9, "SqM": 81, "Phone": null, "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202503/31/2_5/o/y2_1pa_010155_20250331135112.jpeg"}, {"URL": "https://www.yad2.co.il/item/ryr446gv", "Price (\u20aa)": 2199000, "Rooms": 3, "Street": "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 2, "SqM": 89, "Phone": "055-4524659", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202510/25/2_5/o/y2_1pa_010158_20251025184236.jpeg"}, {"URL": "https://www.yad2.co.il/item/lhxgqyd1", "Price (\u20aa)": 2199000, "Rooms": 3, "Street": "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 2, "SqM": 89, "Phone": null, "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202512/03/2_5/o/y2_1pa_010131_20251203131223.jpeg"}, {"URL": "https://www.yad2.co.il/item/my6pnv0s", "Price (\u20aa)": 2190000, "Rooms": 3, "Street": "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 8, "SqM": 88, "Phone": "053-6310312", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202507/09/2_5/o/y2_1_xypAEk9uL6_20250709.png"}, {"URL": "https://www.yad2.co.il/item/apwh2nf5", "Price (\u20aa)": 2150000, "Rooms": 3, "Street": "\u05d3\u05d5\u05d3\u05d5 \u05d3\u05d5\u05ea\u05df", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 6, "SqM": 88, "Phone": "055-4369816", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202505/27/2_5/o/y2_1pa_010944_20250527123858.jpeg"}, {"URL": "https://www.yad2.co.il/item/ok82pyvc", "Price (\u20aa)": 2150000, "Rooms": 3, "Street": "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 9, "SqM": 93, "Phone": "055-4369816", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202509/03/2_5/o/y2_5_nrFaPV0FrP_20250903.jpg"}, {"URL": "https://www.yad2.co.il/item/i2w33px5", "Price (\u20aa)": 2150000, "Rooms": 3, "Street": "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2", "Neighborhood": "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea", "City": "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df", "Floor": 3, "SqM": 95, "Phone": "055-4369816", "Type": "Agency", "Image URL": "https://img.yad2.co.il/Pic/202510/16/2_5/o/y2_1pa_010788_20251016121817.jpeg"}];
+      const allListings = [
+        {
+          URL: "https://www.yad2.co.il/item/8jog0kcc",
+          "Price (\u20aa)": 2690000,
+          Rooms: 4,
+          Street: "\u05d0\u05d5\u05e8\u05e0\u05d4 \u05e4\u05d5\u05e8\u05ea",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 5,
+          SqM: 120,
+          Phone: "055-2129795",
+          Type: "Private",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202512/14/2_1/o/y2_1pa_010926_20251214180530.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/duvn5q5r",
+          "Price (\u20aa)": 2680000,
+          Rooms: 4,
+          Street:
+            "\u05d0\u05e8\u05d9\u05e7 \u05d0\u05d9\u05d9\u05e0\u05e9\u05d8\u05d9\u05d9\u05df",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 3,
+          SqM: 107,
+          Phone: "050-7613337",
+          Type: "Private",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202512/09/2_1/o/y2_1pa_010571_20251209100809.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/zr8nsk4i",
+          "Price (\u20aa)": 2680000,
+          Rooms: 4,
+          Street: "\u05d0\u05d5\u05e8\u05e0\u05d4 \u05e4\u05d5\u05e8\u05ea",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 3,
+          SqM: 120,
+          Phone: "055-2121047",
+          Type: "Private",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202512/15/2_1/o/y2_1_02588_20251215135533.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/xg7f26mi",
+          "Price (\u20aa)": 2660000,
+          Rooms: 4,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 4,
+          SqM: 120,
+          Phone: "055-4369819",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202411/28/2_5/o/y2_5_RI6O2X0qny_20241128.jpg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/p7a10czj",
+          "Price (\u20aa)": 2650000,
+          Rooms: 4,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 5,
+          SqM: 120,
+          Phone: "055-4369819",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202509/08/2_5/o/y2_1pa_010884_20250908145746.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/r4fgtpa9",
+          "Price (\u20aa)": 2650000,
+          Rooms: 4,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 5,
+          SqM: 120,
+          Phone: "055-4369819",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202509/08/2_5/o/y2_1pa_010816_20250908152941.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/3pt44j5f",
+          "Price (\u20aa)": 2650000,
+          Rooms: 4,
+          Street: "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 10,
+          SqM: 124,
+          Phone: "055-4367372",
+          Type: "Agency",
+          "Image URL": null,
+        },
+        {
+          URL: "https://www.yad2.co.il/item/649ci32h",
+          "Price (\u20aa)": 2640000,
+          Rooms: 4,
+          Street: "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 2,
+          SqM: 102,
+          Phone: "055-2126073",
+          Type: "Private",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202511/25/2_1/o/y2_1pa_010337_20251125062658.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/nfm52nzt",
+          "Price (\u20aa)": 2590000,
+          Rooms: 4,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 5,
+          SqM: 119,
+          Phone: "055-4367481",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202506/23/2_5/o/y2_2_3u6kmDonEx_20250623.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/ylh7gb0k",
+          "Price (\u20aa)": 2590000,
+          Rooms: 4,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 5,
+          SqM: 120,
+          Phone: "053-7934431",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202506/15/2_5/o/y2_1pa_010210_20250615005855.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/yukl2dmn",
+          "Price (\u20aa)": 2585000,
+          Rooms: 4,
+          Street:
+            "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 3,
+          SqM: 117,
+          Phone: "055-4367372",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202508/25/2_5/o/y2_1pa_010929_20250825224917.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/pbb9vivv",
+          "Price (\u20aa)": 2585000,
+          Rooms: 4,
+          Street:
+            "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 3,
+          SqM: 117,
+          Phone: "055-4367372",
+          Type: "Agency",
+          "Image URL": null,
+        },
+        {
+          URL: "https://www.yad2.co.il/item/rc4h3iih",
+          "Price (\u20aa)": 2580000,
+          Rooms: 4,
+          Street:
+            "\u05d0\u05e8\u05d9\u05e7 \u05d0\u05d9\u05d9\u05e0\u05e9\u05d8\u05d9\u05d9\u05df",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 3,
+          SqM: 107,
+          Phone: "052-4754966",
+          Type: "Private",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202511/09/2_1/o/y2_1pa_010225_20251109215404.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/42wn2ues",
+          "Price (\u20aa)": 2550000,
+          Rooms: 4,
+          Street: "\u05d0\u05d5\u05e8\u05e0\u05d4 \u05e4\u05d5\u05e8\u05ea",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 2,
+          SqM: 120,
+          Phone: "055-4369816",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202408/18/2_5/o/y2_1pa_010885_20240818104643.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/3ytmq5mg",
+          "Price (\u20aa)": 2550000,
+          Rooms: 4,
+          Street: "\u05d0\u05d5\u05e8\u05e0\u05d4 \u05e4\u05d5\u05e8\u05ea",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 4,
+          SqM: 120,
+          Phone: "055-4369816",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202408/04/2_5/o/y2_1pa_010563_20240804103050.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/aofphzwh",
+          "Price (\u20aa)": 2350000,
+          Rooms: 3,
+          Street: "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 8,
+          SqM: 92,
+          Phone: "052-4545794",
+          Type: "Private",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202505/03/2_1/o/y2_1_07874_20250503220201.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/h7ya6c5s",
+          "Price (\u20aa)": 2350000,
+          Rooms: 3,
+          Street: "\u05d9\u05e8\u05d5\u05e9\u05dc\u05d9\u05dd",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 8,
+          SqM: 92,
+          Phone: "055-2126467",
+          Type: "Private",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202511/24/2_1/o/y2_1pa_010623_20251124213239.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/sf75r2uq",
+          "Price (\u20aa)": 2350000,
+          Rooms: 3,
+          Street: "\u05e9\u05dc\u05de\u05d4 \u05dc\u05d5\u05d9",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 12,
+          SqM: 90,
+          Phone: "055-4308354",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202512/15/2_5/o/y2_1pa_010139_20251215154410.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/1c7lebi6",
+          "Price (\u20aa)": 2350000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 9,
+          SqM: 92,
+          Phone: "055-4363392",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202508/18/2_5/o/y2_3_oLavcu4ngv_20250818.png",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/z4szmk7y",
+          "Price (\u20aa)": 2350000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 2,
+          SqM: 92,
+          Phone: "055-4363392",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202503/04/2_5/o/y2_3_AsGr0X1tS2_20250304.jpg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/4hk9ogl1",
+          "Price (\u20aa)": 2350000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 3,
+          SqM: 92,
+          Phone: null,
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202505/05/2_5/o/y2_8_kZzNxzaTxU_20250505.jpg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/201bgvr5",
+          "Price (\u20aa)": 2350000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 3,
+          SqM: 93,
+          Phone: null,
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202508/26/2_5/o/y2_1pa_010346_20250826221832.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/mvdccyni",
+          "Price (\u20aa)": 2350000,
+          Rooms: 3,
+          Street: "\u05d4\u05e6\u05d1\u05e8",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 6,
+          SqM: 80,
+          Phone: "055-4518809",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202507/30/2_5/o/y2_1pa_010240_20250730160555.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/66sik7eu",
+          "Price (\u20aa)": 2350000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 11,
+          SqM: 100,
+          Phone: "053-7934431",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202507/06/2_5/o/y2_1pa_010835_20250706003338.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/0vjgs9qr",
+          "Price (\u20aa)": 2350000,
+          Rooms: 3,
+          Street:
+            "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 2,
+          SqM: 89,
+          Phone: "055-4361796",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202303/27/2_5/o/y2_1_997723_20230327.jpg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/txpr11yk",
+          "Price (\u20aa)": 2350000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 4,
+          SqM: 90,
+          Phone: "055-4363392",
+          Type: "Agency",
+          "Image URL": "",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/sk6a8c73",
+          "Price (\u20aa)": 2340000,
+          Rooms: 3,
+          Street: "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 4,
+          SqM: 88,
+          Phone: "054-9762561",
+          Type: "Private",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202511/10/2_1/o/y2_1pa_010391_20251110104046.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/wu158yck",
+          "Price (\u20aa)": 2325000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 2,
+          SqM: 90,
+          Phone: "055-4363392",
+          Type: "Agency",
+          "Image URL": "",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/0nk44bko",
+          "Price (\u20aa)": 2300000,
+          Rooms: 3,
+          Street:
+            "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 6,
+          SqM: 90,
+          Phone: "055-2110115",
+          Type: "Private",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202507/14/2_1/o/y2_1pa_010842_20250714222002.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/hpqvpv84",
+          "Price (\u20aa)": 2300000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 5,
+          SqM: 92,
+          Phone: "055-4363392",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202510/26/2_5/o/y2_7_mrbMgXE_999988_20251026.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/xrkrr8yy",
+          "Price (\u20aa)": 2299000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 3,
+          SqM: 90,
+          Phone: "055-4523584",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202511/23/2_5/o/y2_9_X90uMhsAn1_20251123.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/sw7cyuw7",
+          "Price (\u20aa)": 2290000,
+          Rooms: 3,
+          Street: "\u05d0\u05d5\u05e8\u05e0\u05d4 \u05e4\u05d5\u05e8\u05ea",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 5,
+          SqM: 75,
+          Phone: "055-4361115",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202510/06/2_5/o/y2_1pa_010629_20251006130613.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/z2vy5asn",
+          "Price (\u20aa)": 2290000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 2,
+          SqM: 93,
+          Phone: "055-4367481",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202510/28/2_5/o/y2_2_Zjq8gx9o3L_20251028.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/68k92evo",
+          "Price (\u20aa)": 2290000,
+          Rooms: 3,
+          Street: "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 11,
+          SqM: 85,
+          Phone: "055-4367998",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202510/05/2_5/o/y2_9_KCvPqQvhtz_20251005.jpg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/g5zpi21a",
+          "Price (\u20aa)": 2290000,
+          Rooms: 3,
+          Street:
+            "\u05e9\u05d5\u05dc\u05de\u05d9\u05ea \u05d0\u05dc\u05d5\u05e0\u05d9",
+          Neighborhood:
+            "\u05e0\u05d7\u05dc\u05ea \u05d9\u05d4\u05d5\u05d3\u05d4",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 8,
+          SqM: 82,
+          Phone: "055-4368579",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202507/16/2_5/o/y2_1pa_010979_20250716220542.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/5vzia1vx",
+          "Price (\u20aa)": 2290000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05d5\u05e8\u05d9\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 10,
+          SqM: 86,
+          Phone: "055-4559813",
+          Type: "Agency",
+          "Image URL": "",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/ay68rrp3",
+          "Price (\u20aa)": 2290000,
+          Rooms: 3,
+          Street: "\u05d9\u05e8\u05d5\u05e9\u05dc\u05d9\u05dd",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 3,
+          SqM: 80,
+          Phone: "055-4360850",
+          Type: "Agency",
+          "Image URL": "",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/a6nujqx5",
+          "Price (\u20aa)": 2280000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 4,
+          SqM: 91,
+          Phone: "055-4363123",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202511/26/2_5/o/y2_1pa_010528_20251126135019.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/slrlj7ic",
+          "Price (\u20aa)": 2270000,
+          Rooms: 3,
+          Street: "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 17,
+          SqM: 88,
+          Phone: "055-4525083",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202512/03/2_5/o/y2_1_lqA178tj7G_20251203.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/tghi697z",
+          "Price (\u20aa)": 2270000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 4,
+          SqM: 86,
+          Phone: "055-4367481",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202505/19/2_5/o/y2_5_fIrT83EHaf_20250519.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/13tjiov7",
+          "Price (\u20aa)": 2265000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 8,
+          SqM: 93,
+          Phone: "055-4363392",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202509/09/2_5/o/y2_7_EWuHOOgS0S_20250909.png",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/5pit9jya",
+          "Price (\u20aa)": 2250000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 6,
+          SqM: 90,
+          Phone: "055-4363392",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202507/30/2_5/o/y2_3_fQiOYSRtFz_20250730.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/314v5h7z",
+          "Price (\u20aa)": 2250000,
+          Rooms: 3,
+          Street:
+            "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 3,
+          SqM: 90,
+          Phone: "053-2447866",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202509/02/2_5/o/y2_1pa_010831_20250902121842.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/kg9tbhv0",
+          "Price (\u20aa)": 2250000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 5,
+          SqM: 92,
+          Phone: "055-4363392",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202508/21/2_5/o/y2_1pa_010638_20250821141256.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/4lz4qurb",
+          "Price (\u20aa)": 2250000,
+          Rooms: 3,
+          Street: "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 15,
+          SqM: 88,
+          Phone: "055-4525083",
+          Type: "Agency",
+          "Image URL": "",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/926ukemm",
+          "Price (\u20aa)": 2240000,
+          Rooms: 3,
+          Street:
+            "\u05d9\u05e2\u05e7\u05d1 \u05d1\u05df \u05e1\u05d9\u05e8\u05d0",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 2,
+          SqM: 88,
+          Phone: "055-4307200",
+          Type: "Agency",
+          "Image URL": "",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/iq13yfen",
+          "Price (\u20aa)": 2230000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 16,
+          SqM: 90,
+          Phone: "053-6310312",
+          Type: "Agency",
+          "Image URL": null,
+        },
+        {
+          URL: "https://www.yad2.co.il/item/cl0ypx01",
+          "Price (\u20aa)": 2200000,
+          Rooms: 3,
+          Street: "\u05d4\u05dc\u05d5\u05d7\u05de\u05d5\u05ea",
+          Neighborhood: "\u05e0\u05e8\u05e7\u05d9\u05e1\u05d9\u05dd",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 2,
+          SqM: 90,
+          Phone: "055-4528217",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202507/15/2_5/o/y2_1pa_010077_20250715130040.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/rmgn3zps",
+          "Price (\u20aa)": 2200000,
+          Rooms: 3,
+          Street: "\u05d0\u05dc\u05d9 \u05d9\u05d1\u05dc\u05d5\u05df",
+          Neighborhood: "\u05e0\u05d5\u05e8\u05d9\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 9,
+          SqM: 81,
+          Phone: null,
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202503/31/2_5/o/y2_1pa_010155_20250331135112.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/ryr446gv",
+          "Price (\u20aa)": 2199000,
+          Rooms: 3,
+          Street: "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 2,
+          SqM: 89,
+          Phone: "055-4524659",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202510/25/2_5/o/y2_1pa_010158_20251025184236.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/lhxgqyd1",
+          "Price (\u20aa)": 2199000,
+          Rooms: 3,
+          Street: "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 2,
+          SqM: 89,
+          Phone: null,
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202512/03/2_5/o/y2_1pa_010131_20251203131223.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/my6pnv0s",
+          "Price (\u20aa)": 2190000,
+          Rooms: 3,
+          Street: "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 8,
+          SqM: 88,
+          Phone: "053-6310312",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202507/09/2_5/o/y2_1_xypAEk9uL6_20250709.png",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/apwh2nf5",
+          "Price (\u20aa)": 2150000,
+          Rooms: 3,
+          Street: "\u05d3\u05d5\u05d3\u05d5 \u05d3\u05d5\u05ea\u05df",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 6,
+          SqM: 88,
+          Phone: "055-4369816",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202505/27/2_5/o/y2_1pa_010944_20250527123858.jpeg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/ok82pyvc",
+          "Price (\u20aa)": 2150000,
+          Rooms: 3,
+          Street: "\u05d7\u05d9\u05d9\u05dd \u05d7\u05e4\u05e8",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 9,
+          SqM: 93,
+          Phone: "055-4369816",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202509/03/2_5/o/y2_5_nrFaPV0FrP_20250903.jpg",
+        },
+        {
+          URL: "https://www.yad2.co.il/item/i2w33px5",
+          "Price (\u20aa)": 2150000,
+          Rooms: 3,
+          Street: "\u05dc\u05d0 \u05d9\u05d3\u05d5\u05e2",
+          Neighborhood: "\u05d4\u05e8\u05e7\u05e4\u05d5\u05ea",
+          City: "\u05e8\u05d0\u05e9\u05d5\u05df \u05dc\u05e6\u05d9\u05d5\u05df",
+          Floor: 3,
+          SqM: 95,
+          Phone: "055-4369816",
+          Type: "Agency",
+          "Image URL":
+            "https://img.yad2.co.il/Pic/202510/16/2_5/o/y2_1pa_010788_20251016121817.jpeg",
+        },
+      ];
 
-        function getFilteredListings() {
-            // Get selected values from checkboxes (multiple select)
-            const selectedRooms = Array.from(document.querySelectorAll('.rooms-checkbox:checked')).map(cb => parseFloat(cb.value));
-            const selectedNeighborhoods = Array.from(document.querySelectorAll('.neighborhood-checkbox:checked')).map(cb => cb.value);
-            const selectedCities = Array.from(document.querySelectorAll('.city-checkbox:checked')).map(cb => cb.value);
-            const selectedTypes = Array.from(document.querySelectorAll('.type-checkbox:checked')).map(cb => cb.value);
-            const priceSort = document.getElementById('priceSort').value;
+      function getFilteredListings() {
+        // Get selected values from checkboxes (multiple select)
+        const selectedRooms = Array.from(
+          document.querySelectorAll(".rooms-checkbox:checked")
+        ).map((cb) => parseFloat(cb.value));
+        const selectedNeighborhoods = Array.from(
+          document.querySelectorAll(".neighborhood-checkbox:checked")
+        ).map((cb) => cb.value);
+        const selectedCities = Array.from(
+          document.querySelectorAll(".city-checkbox:checked")
+        ).map((cb) => cb.value);
+        const selectedTypes = Array.from(
+          document.querySelectorAll(".type-checkbox:checked")
+        ).map((cb) => cb.value);
+        const priceSort = document.getElementById("priceSort").value;
 
-            let filtered = allListings.filter(listing => {
-                let match = true;
-                
-                // If rooms filters are selected, listing must match at least one
-                if (selectedRooms.length > 0) {
-                    match = match && selectedRooms.includes(parseFloat(listing['Rooms']));
-                }
-                
-                // If neighborhood filters are selected, listing must match at least one
-                if (selectedNeighborhoods.length > 0) {
-                    match = match && selectedNeighborhoods.includes(listing['Neighborhood']);
-                }
-                
-                // If city filters are selected, listing must match at least one
-                if (selectedCities.length > 0) {
-                    match = match && selectedCities.includes(listing['City']);
-                }
-                
-                // If type filters are selected, listing must match at least one
-                if (selectedTypes.length > 0) {
-                    match = match && selectedTypes.includes(listing['Type']);
-                }
-                
-                return match;
-            });
+        let filtered = allListings.filter((listing) => {
+          let match = true;
 
-            // Apply sorting
-            if (priceSort === 'asc') {
-                filtered.sort((a, b) => a['Price (₪)'] - b['Price (₪)']);
-            } else if (priceSort === 'desc') {
-                filtered.sort((a, b) => b['Price (₪)'] - a['Price (₪)']);
-            }
+          // If rooms filters are selected, listing must match at least one
+          if (selectedRooms.length > 0) {
+            match =
+              match && selectedRooms.includes(parseFloat(listing["Rooms"]));
+          }
 
-            return filtered;
+          // If neighborhood filters are selected, listing must match at least one
+          if (selectedNeighborhoods.length > 0) {
+            match =
+              match && selectedNeighborhoods.includes(listing["Neighborhood"]);
+          }
+
+          // If city filters are selected, listing must match at least one
+          if (selectedCities.length > 0) {
+            match = match && selectedCities.includes(listing["City"]);
+          }
+
+          // If type filters are selected, listing must match at least one
+          if (selectedTypes.length > 0) {
+            match = match && selectedTypes.includes(listing["Type"]);
+          }
+
+          return match;
+        });
+
+        // Apply sorting
+        if (priceSort === "asc") {
+          filtered.sort((a, b) => a["Price (₪)"] - b["Price (₪)"]);
+        } else if (priceSort === "desc") {
+          filtered.sort((a, b) => b["Price (₪)"] - a["Price (₪)"]);
         }
 
-        function renderListings(listings) {
-            const grid = document.getElementById('listingsGrid');
-            const info = document.getElementById('resultsInfo');
-            
-            if (listings.length === 0) {
-                grid.innerHTML = '<div class="no-results" style="grid-column: 1/-1;">No listings match your filters</div>';
-                info.textContent = 'Showing 0 listings';
-                return;
-            }
+        return filtered;
+      }
 
-            info.textContent = `Showing ${listings.length} of ${allListings.length} listings`;
-            
-            grid.innerHTML = listings.map(row => {
-                const price = `${parseInt(row['Price (₪)']).toLocaleString()}`;
-                const imageUrl = row['Image URL'];
-                const imageHtml = imageUrl ? 
-                    `<img src="${imageUrl}" alt="Listing image" class="listing-image">` : 
-                    '<div class="no-image">No image available</div>';
-                const typeClass = row['Type'] === 'Private' ? 'type-private' : 'type-agency';
-                const phone = row['Phone'] || 'N/A';
-                
-                return `
+      function renderListings(listings) {
+        const grid = document.getElementById("listingsGrid");
+        const info = document.getElementById("resultsInfo");
+
+        if (listings.length === 0) {
+          grid.innerHTML =
+            '<div class="no-results" style="grid-column: 1/-1;">אין נכסים התואמים את הסינונים שלך</div>';
+          info.textContent = "מוצגים 0 נכסים";
+          return;
+        }
+
+        info.textContent = `מוצגים ${listings.length} מתוך ${allListings.length} נכסים`;
+
+        grid.innerHTML = listings
+          .map((row) => {
+            const price = `${parseInt(row["Price (₪)"]).toLocaleString()}`;
+            const imageUrl = row["Image URL"];
+            const imageHtml = imageUrl
+              ? `<img src="${imageUrl}" alt="Listing image" class="listing-image">`
+              : '<div class="no-image">אין תמונה זמינה</div>';
+            const typeClass =
+              row["Type"] === "Private" ? "type-private" : "type-agency";
+            const typeText = row["Type"] === "Private" ? "פרטי" : "חברה";
+            const phone = row["Phone"] || "N/A";
+
+            return `
                     <div class="listing-card">
                         <div class="image-container">
                             ${imageHtml}
@@ -476,53 +1339,54 @@
                             <div class="price">₪ ${price}</div>
                             <div class="details">
                                 <div class="detail-row">
-                                    <span class="detail-label">Rooms:</span>
-                                    <span class="detail-value">${row['Rooms']}</span>
+                                    <span class="detail-label">חדרים:</span>
+                                    <span class="detail-value">${row["Rooms"]}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span class="detail-label">SqM:</span>
-                                    <span class="detail-value">${row['SqM']}</span>
+                                    <span class="detail-label">קוב"ר:</span>
+                                    <span class="detail-value">${row["SqM"]}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span class="detail-label">Floor:</span>
-                                    <span class="detail-value">${row['Floor']}</span>
+                                    <span class="detail-label">קומה:</span>
+                                    <span class="detail-value">${row["Floor"]}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span class="detail-label">Street:</span>
-                                    <span class="detail-value">${row['Street']}</span>
+                                    <span class="detail-label">רחוב:</span>
+                                    <span class="detail-value">${row["Street"]}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span class="detail-label">Neighborhood:</span>
-                                    <span class="detail-value">${row['Neighborhood']}</span>
+                                    <span class="detail-label">שכונה:</span>
+                                    <span class="detail-value">${row["Neighborhood"]}</span>
                                 </div>
                             </div>
-                            <span class="type-badge ${typeClass}">${row['Type']}</span>
+                            <span class="type-badge ${typeClass}">${typeText}</span>
                             <div class="footer">
-                                <a href="${row['URL']}" target="_blank" class="btn btn-link">View</a>
-                                <a href="tel:${phone}" class="btn btn-phone">📞 Call</a>
+                                <a href="${row["URL"]}" target="_blank" class="btn btn-link">צפה</a>
+                                <a href="tel:${phone}" class="btn btn-phone">📞 צור קשר</a>
                             </div>
                         </div>
                     </div>
                 `;
-            }).join('');
-        }
+          })
+          .join("");
+      }
 
-        function applyFilters() {
-            const filtered = getFilteredListings();
-            renderListings(filtered);
-        }
+      function applyFilters() {
+        const filtered = getFilteredListings();
+        renderListings(filtered);
+      }
 
-        function clearFilters() {
-            document.getElementById('roomsFilter').value = '';
-            document.getElementById('neighborhoodFilter').value = '';
-            document.getElementById('cityFilter').value = '';
-            document.getElementById('typeFilter').value = '';
-            document.getElementById('priceSort').value = '';
-            renderListings(allListings);
-        }
+      function clearFilters() {
+        document.getElementById("roomsFilter").value = "";
+        document.getElementById("neighborhoodFilter").value = "";
+        document.getElementById("cityFilter").value = "";
+        document.getElementById("typeFilter").value = "";
+        document.getElementById("priceSort").value = "";
+        renderListings(allListings);
+      }
 
-        // Initial render with default sort (lowest first)
-        applyFilters();
+      // Initial render with default sort (lowest first)
+      applyFilters();
     </script>
-</body>
+  </body>
 </html>

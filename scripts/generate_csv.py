@@ -75,15 +75,15 @@ def generate_html_from_seen(rows):
         avg_price_4_45 = int(sum(r["Price (₪)"] for r in rooms_4_45) / len(rooms_4_45)) if rooms_4_45 else 0
         
         # Search criteria
-        search_1_info = "3-3.5 rooms | 70+ sqm | Max ₪2,350,000"
-        search_2_info = "4-4.5 rooms | 85+ sqm | Max ₪2,700,000"
+        search_1_info = "חדרים 3-3.5 | 70+ מ'ר | מחיר מקס ₪2,350,000"
+        search_2_info = "חדרים 4-4.5 | 85+ מ'ר | מחיר מקס ₪2,700,000"
         
         html_content = """<!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yad2 Listings - Live View</title>
+    <title>Yad2 הנכסים - צפייה חיה</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -401,49 +401,49 @@ def generate_html_from_seen(rows):
 </head>
 <body>
     <div class="container">
-        <h1>🏠 Yad2 Listings</h1>
-        <div class="info">Last updated: """ + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</div>
+        <h1>🏠 הנכסים ברשת Yad2</h1>
+        <div class="info">עדכון אחרון: """ + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</div>
         
         <div class="search-info">
-            <div class="search-info-title">📋 Active Searches</div>
-            <div class="search-info-item"><strong>Search 1:</strong> """ + search_1_info + """</div>
-            <div class="search-info-item"><strong>Search 2:</strong> """ + search_2_info + """</div>
+            <div class="search-info-title">📋 חיפושים פעילים</div>
+            <div class="search-info-item"><strong>חיפוש 1:</strong> """ + search_1_info + """</div>
+            <div class="search-info-item"><strong>חיפוש 2:</strong> """ + search_2_info + """</div>
         </div>
         
         <div class="stats">
             <div class="stat">
                 <div class="stat-value">""" + str(len(rows)) + """</div>
-                <div class="stat-label">Total Listings</div>
+                <div class="stat-label">סה"כ נכסים</div>
             </div>
             <div class="stat">
                 <div class="stat-value">₪ """ + format(avg_price_3_35, ',') + """</div>
-                <div class="stat-label">Average Price</div>
-                <div class="stat-sublabel">3-3.5 Rooms (""" + str(len(rooms_3_35)) + """)</div>
+                <div class="stat-label">מחיר ממוצע</div>
+                <div class="stat-sublabel">חדרים 3-3.5 (""" + str(len(rooms_3_35)) + """)</div>
             </div>
             <div class="stat">
                 <div class="stat-value">₪ """ + format(avg_price_4_45, ',') + """</div>
-                <div class="stat-label">Average Price</div>
-                <div class="stat-sublabel">4-4.5 Rooms (""" + str(len(rooms_4_45)) + """)</div>
+                <div class="stat-label">מחיר ממוצע</div>
+                <div class="stat-sublabel">חדרים 4-4.5 (""" + str(len(rooms_4_45)) + """)</div>
             </div>
         </div>
 
         <div class="filters-section">
-            <div class="filters-title">🔍 Filters & Sort</div>
+            <div class="filters-title">🔍 סינונים ומיון</div>
             <div class="filters-grid">
                 <div class="filter-group">
-                    <label class="filter-label">Rooms</label>
+                    <label class="filter-label">מספר חדרים</label>
                     <div class="filter-options" id="roomsFilterContainer">
 """
         
         # Extract unique rooms, sorted
         rooms = sorted(set(r["Rooms"] for r in rows if r["Rooms"]))
         for i, room in enumerate(rooms):
-            html_content += f'                        <div class="filter-option"><input type="checkbox" id="rooms_{i}" value="{room}" class="rooms-checkbox"><label for="rooms_{i}">{room} rooms</label></div>\n'
+            html_content += f'                        <div class="filter-option"><input type="checkbox" id="rooms_{i}" value="{room}" class="rooms-checkbox"><label for="rooms_{i}">{room} חדרים</label></div>\n'
         
         html_content += """                    </div>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Neighborhood</label>
+                    <label class="filter-label">שכונה</label>
                     <div class="filter-options" id="neighborhoodFilterContainer">
 """
         
@@ -455,7 +455,7 @@ def generate_html_from_seen(rows):
         html_content += """                    </div>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">City</label>
+                    <label class="filter-label">עיר</label>
                     <div class="filter-options" id="cityFilterContainer">
 """
         
@@ -467,23 +467,23 @@ def generate_html_from_seen(rows):
         html_content += """                    </div>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Type</label>
+                    <label class="filter-label">סוג</label>
                     <div class="filter-options">
-                        <div class="filter-option"><input type="checkbox" id="type_0" value="Private" class="type-checkbox"><label for="type_0">Private</label></div>
-                        <div class="filter-option"><input type="checkbox" id="type_1" value="Agency" class="type-checkbox"><label for="type_1">Agency</label></div>
+                        <div class="filter-option"><input type="checkbox" id="type_0" value="Private" class="type-checkbox"><label for="type_0">פרטי</label></div>
+                        <div class="filter-option"><input type="checkbox" id="type_1" value="Agency" class="type-checkbox"><label for="type_1">חברה</label></div>
                     </div>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Sort by Price</label>
+                    <label class="filter-label">מיון לפי מחיר</label>
                     <select class="filter-select" id="priceSort">
-                        <option value="">None</option>
-                        <option value="desc">Highest First</option>
-                        <option value="asc" selected>Lowest First</option>
+                        <option value="">ללא מיון</option>
+                        <option value="desc">יקר ביותר</option>
+                        <option value="asc" selected>זול ביותר</option>
                     </select>
                 </div>
                 <div class="filter-buttons">
-                    <button class="btn-filter btn-apply" onclick="applyFilters()">Apply Filters</button>
-                    <button class="btn-filter btn-clear" onclick="clearFilters()">Clear All</button>
+                    <button class="btn-filter btn-apply" onclick="applyFilters()">החל סינונים</button>
+                    <button class="btn-filter btn-clear" onclick="clearFilters()">נקה הכל</button>
                 </div>
             </div>
         </div>
@@ -547,20 +547,21 @@ def generate_html_from_seen(rows):
             const info = document.getElementById('resultsInfo');
             
             if (listings.length === 0) {
-                grid.innerHTML = '<div class="no-results" style="grid-column: 1/-1;">No listings match your filters</div>';
-                info.textContent = 'Showing 0 listings';
+                grid.innerHTML = '<div class="no-results" style="grid-column: 1/-1;">אין נכסים התואמים את הסינונים שלך</div>';
+                info.textContent = 'מוצגים 0 נכסים';
                 return;
             }
 
-            info.textContent = `Showing ${listings.length} of ${allListings.length} listings`;
+            info.textContent = `מוצגים ${listings.length} מתוך ${allListings.length} נכסים`;
             
             grid.innerHTML = listings.map(row => {
                 const price = `${parseInt(row['Price (₪)']).toLocaleString()}`;
                 const imageUrl = row['Image URL'];
                 const imageHtml = imageUrl ? 
                     `<img src="${imageUrl}" alt="Listing image" class="listing-image">` : 
-                    '<div class="no-image">No image available</div>';
+                    '<div class="no-image">אין תמונה זמינה</div>';
                 const typeClass = row['Type'] === 'Private' ? 'type-private' : 'type-agency';
+                const typeText = row['Type'] === 'Private' ? 'פרטי' : 'חברה';
                 const phone = row['Phone'] || 'N/A';
                 
                 return `
@@ -572,30 +573,30 @@ def generate_html_from_seen(rows):
                             <div class="price">₪ ${price}</div>
                             <div class="details">
                                 <div class="detail-row">
-                                    <span class="detail-label">Rooms:</span>
+                                    <span class="detail-label">חדרים:</span>
                                     <span class="detail-value">${row['Rooms']}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span class="detail-label">SqM:</span>
+                                    <span class="detail-label">קוב"ר:</span>
                                     <span class="detail-value">${row['SqM']}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span class="detail-label">Floor:</span>
+                                    <span class="detail-label">קומה:</span>
                                     <span class="detail-value">${row['Floor']}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span class="detail-label">Street:</span>
+                                    <span class="detail-label">רחוב:</span>
                                     <span class="detail-value">${row['Street']}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span class="detail-label">Neighborhood:</span>
+                                    <span class="detail-label">שכונה:</span>
                                     <span class="detail-value">${row['Neighborhood']}</span>
                                 </div>
                             </div>
-                            <span class="type-badge ${typeClass}">${row['Type']}</span>
+                            <span class="type-badge ${typeClass}">${typeText}</span>
                             <div class="footer">
-                                <a href="${row['URL']}" target="_blank" class="btn btn-link">View</a>
-                                <a href="tel:${phone}" class="btn btn-phone">📞 Call</a>
+                                <a href="${row['URL']}" target="_blank" class="btn btn-link">צפה</a>
+                                <a href="tel:${phone}" class="btn btn-phone">📞 צור קשר</a>
                             </div>
                         </div>
                     </div>
