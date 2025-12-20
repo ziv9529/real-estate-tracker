@@ -415,11 +415,6 @@ def generate_html_from_seen(rows):
                 <div class="stat-value">""" + str(len(rows)) + """</div>
                 <div class="stat-label">Total Listings</div>
             </div>
-            # <div class="stat">
-            #     <div class="stat-value">₪ """ + format(int(sum(r["Price (₪)"] for r in rows if r["Price (₪)"]) / len(rows)) if rows else 0, ',') + """</div>
-            #     <div class="stat-label">Average Price</div>
-            #     <div class="stat-sublabel">All Listings</div>
-            # </div>
             <div class="stat">
                 <div class="stat-value">₪ """ + format(avg_price_3_35, ',') + """</div>
                 <div class="stat-label">Average Price</div>
