@@ -646,5 +646,17 @@
     "phone": "055-4307200",
     "token": "926ukemm",
     "is_private": false
+  },
+  "https://www.yad2.co.il/item/3ytmq5mg": {
+    "price": 2550000,
+    "rooms": 4,
+    "street": "אורנה פורת",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 4,
+    "sqm": 120,
+    "phone": "055-4369816",
+    "token": "3ytmq5mg",
+    "is_private": false
   }
 }
