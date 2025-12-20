@@ -137,7 +137,8 @@
     "sqm": 90,
     "phone": "055-4363392",
     "token": "5pit9jya",
-    "is_private": false
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202507/30/2_5/o/y2_3_fQiOYSRtFz_20250730.jpeg"
   },
   "https://www.yad2.co.il/item/hpqvpv84": {
     "price": 2300000,
@@ -686,5 +687,18 @@
     "phone": "055-4307200",
     "token": "926ukemm",
     "is_private": false
+  },
+  "https://www.yad2.co.il/item/3ytmq5mg": {
+    "price": 2550000,
+    "rooms": 4,
+    "street": "אורנה פורת",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 4,
+    "sqm": 120,
+    "phone": "055-4369816",
+    "token": "3ytmq5mg",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202408/04/2_5/o/y2_1pa_010563_20240804103050.jpeg"
   }
 }
