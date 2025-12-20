@@ -646,7 +646,8 @@
     "sqm": 80,
     "phone": "055-4360850",
     "token": "ay68rrp3",
-    "is_private": false
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202511/17/2_5/o/y2_1pa_010979_20251117153700.jpeg"
   },
   "https://www.yad2.co.il/item/a6nujqx5": {
     "price": 2280000,
@@ -671,7 +672,8 @@
     "sqm": 88,
     "phone": "055-4525083",
     "token": "4lz4qurb",
-    "is_private": false
+    "is_private": false,
+    "cover_image": null
   },
   "https://www.yad2.co.il/item/txpr11yk": {
     "price": 2350000,
@@ -683,7 +685,8 @@
     "sqm": 90,
     "phone": "055-4363392",
     "token": "txpr11yk",
-    "is_private": false
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202509/20/2_5/o/y2_9_K8ufWrrF00_20250920.jpeg"
   },
   "https://www.yad2.co.il/item/926ukemm": {
     "price": 2240000,
