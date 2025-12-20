@@ -56,14 +56,18 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python scripts/scraper_with_alerts.py
 
-      # Step 6: Commit and push seen.json and phone_cache.json if they changed (to persist state)
-      - name: Commit updated seen.json and phone_cache.json
+      # Step 5.5: Generate CSV from seen.json
+      - name: Generate CSV from listings
+        run: python scripts/generate_csv.py
+
+      # Step 6: Commit and push seen.json, phone_cache.json, and listings.csv if they changed (to persist state)
+      - name: Commit updated seen.json, phone_cache.json, listings.csv, and listings.html
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add seen.json phone_cache.json
+          git add seen.json phone_cache.json listings.csv listings.html
           git commit -m "Update tracked listings and phone cache [$(date +'%Y-%m-%d %H:%M:%S')]" || echo "No changes to commit"
           git push origin main

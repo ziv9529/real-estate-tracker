@@ -195,6 +195,8 @@ def extract_listing_data(item):
     address = item.get("address", {})
     # Check if listing is private or agency based on adType field
     is_private = item.get("adType") == "private"
+    # Extract cover image URL if available
+    cover_image = item.get("metaData", {}).get("coverImage", None)
     return {
         "price": item.get("price", 0),
         "rooms": item.get("additionalDetails", {}).get("roomsCount"),
@@ -206,6 +208,7 @@ def extract_listing_data(item):
         "phone": None,  # Will be filled async
         "token": token,
         "is_private": is_private,
+        "cover_image": cover_image,
     }
 
 def is_possible_duplicate(new_item_data):
@@ -346,9 +349,16 @@ async def check_yad2_listings():
                 
                 # Check if listing is already tracked
                 if url in seen:
-                    if seen[url]["price"] != price:
-                        old_price = seen[url]["price"]
-                        seen[url] = item_data
+                    # Store old data to compare
+                    old_data = seen[url].copy()
+                    
+                    # Update the listing with new data (merges/adds missing fields like cover_image)
+                    seen[url].update(item_data)
+                    
+                    # Check if anything changed
+                    if old_data["price"] != price:
+                        # Price changed
+                        old_price = old_data["price"]
                         save_seen()
                         
                         message = (
@@ -360,6 +370,10 @@ async def check_yad2_listings():
                         logger.info(f"Price change detected: {street} - {old_price}₪ → {price}₪")
                         send_telegram(message)
                         changes += 1
+                    elif old_data != seen[url]:
+                        # Other fields changed (like cover_image or other data)
+                        logger.debug(f"Listing updated with new fields: {street}")
+                        save_seen()
                 else:
                     # New listing - check if it's a duplicate repost
                     old_url, old_data = is_possible_duplicate(item_data)
