@@ -726,5 +726,18 @@
     "token": "sxcttcn3",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202511/25/2_5/o/y2_1_997280_20251125.png"
+  },
+  "https://www.yad2.co.il/item/q30c91qp": {
+    "price": 2250000,
+    "rooms": 3,
+    "street": "דודו דותן",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 90,
+    "phone": "055-4366098",
+    "token": "q30c91qp",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202512/21/2_5/o/y2_1pa_010012_20251221162140.jpeg"
   }
 }
