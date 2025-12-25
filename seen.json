@@ -830,5 +830,18 @@
     "token": "k8o87q8g",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202512/25/2_5/o/y2_3_P_BV7yneAN_20251225.jpg"
+  },
+  "https://www.yad2.co.il/item/8rl3n64d": {
+    "price": 2590000,
+    "rooms": 4,
+    "street": "לא ידוע",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 5,
+    "sqm": 120,
+    "phone": "053-7934431",
+    "token": "8rl3n64d",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202512/25/2_5/o/y2_1pa_010578_20251225165153.jpeg"
   }
 }
