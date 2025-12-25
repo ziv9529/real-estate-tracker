@@ -65,7 +65,7 @@
     "cover_image": "https://img.yad2.co.il/Pic/202512/15/2_5/o/y2_1pa_010139_20251215154410.jpeg"
   },
   "https://www.yad2.co.il/item/cl0ypx01": {
-    "price": 2170000,
+    "price": 2230000,
     "rooms": 3,
     "street": "הלוחמות",
     "neighborhood": "נרקיסים",
@@ -75,7 +75,7 @@
     "phone": "055-4528217",
     "token": "cl0ypx01",
     "is_private": false,
-    "cover_image": "https://img.yad2.co.il/Pic/202507/15/2_5/o/y2_1pa_010077_20250715130040.jpeg"
+    "cover_image": "https://img.yad2.co.il/Pic/202512/25/2_5/o/y2_1_g8RGZir_Eq_20251225.jpeg"
   },
   "https://www.yad2.co.il/item/ryr446gv": {
     "price": 2199000,
@@ -791,5 +791,18 @@
     "token": "k4za70fx",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202512/25/2_5/o/y2_1pa_010621_20251225091508.jpeg"
+  },
+  "https://www.yad2.co.il/item/q4r7qqe2": {
+    "price": 2250000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 17,
+    "sqm": 90,
+    "phone": "055-4525084",
+    "token": "q4r7qqe2",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202512/25/2_5/o/y2_1pa_010195_20251225130420.jpeg"
   }
 }
