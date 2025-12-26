@@ -843,5 +843,18 @@
     "token": "8rl3n64d",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202512/25/2_5/o/y2_1pa_010578_20251225165153.jpeg"
+  },
+  "https://www.yad2.co.il/item/b0rpab86": {
+    "price": 2190000,
+    "rooms": 3,
+    "street": "הלוחמות",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 83,
+    "phone": "055-4528217",
+    "token": "b0rpab86",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202512/26/2_5/o/y2_1pa_010354_20251226090430.jpeg"
   }
 }
