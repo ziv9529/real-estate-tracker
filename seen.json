@@ -882,5 +882,31 @@
     "token": "wq9d7ct1",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202512/28/2_5/o/y2_1_ntFmx7H89I_20251228.jpg"
+  },
+  "https://www.yad2.co.il/item/rrbugahk": {
+    "price": 2190000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 87,
+    "phone": "055-4524659",
+    "token": "rrbugahk",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202506/01/2_5/o/y2_1pa_010797_20250601164017.jpeg"
+  },
+  "https://www.yad2.co.il/item/zdvnrd6f": {
+    "price": 2200000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 89,
+    "phone": null,
+    "token": "zdvnrd6f",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202511/13/2_5/o/y2_1pa_010746_20251113140510.jpeg"
   }
 }
