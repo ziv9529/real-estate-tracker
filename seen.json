@@ -934,5 +934,18 @@
     "token": "85o1ui3h",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202512/30/2_5/o/y2_1_SP5pem5w_x_20251230.jpg"
+  },
+  "https://www.yad2.co.il/item/cysp836j": {
+    "price": 2190000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 83,
+    "phone": "055-4528217",
+    "token": "cysp836j",
+    "is_private": false,
+    "cover_image": null
   }
 }
