@@ -947,5 +947,18 @@
     "token": "cysp836j",
     "is_private": false,
     "cover_image": null
+  },
+  "https://www.yad2.co.il/item/iuall64f": {
+    "price": 2199000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 89,
+    "phone": "055-4524659",
+    "token": "iuall64f",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202512/31/2_5/o/y2_1pa_010440_20251231151557.jpeg"
   }
 }
