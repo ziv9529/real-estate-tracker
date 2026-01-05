@@ -1025,5 +1025,31 @@
     "token": "m2gq88jq",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202601/05/2_5/o/y2_1pa_010168_20260105205214.jpeg"
+  },
+  "https://www.yad2.co.il/item/8akslr2u": {
+    "price": 2250000,
+    "rooms": 3,
+    "street": "דודו דותן",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 15,
+    "sqm": 85,
+    "phone": "055-4528217",
+    "token": "8akslr2u",
+    "is_private": false,
+    "cover_image": null
+  },
+  "https://www.yad2.co.il/item/pjjx3j1j": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 81,
+    "phone": null,
+    "token": "pjjx3j1j",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202601/05/2_5/o/y2_2_xTWnnTfozX_20260105.jpeg"
   }
 }
