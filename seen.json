@@ -999,5 +999,18 @@
     "token": "uu1y7b6s",
     "is_private": true,
     "cover_image": "https://img.yad2.co.il/Pic/202601/01/2_1/o/y2_1pa_010562_20260101221306.jpeg"
+  },
+  "https://www.yad2.co.il/item/fiatsvpj": {
+    "price": 2300000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 5,
+    "sqm": 92,
+    "phone": "055-4363392",
+    "token": "fiatsvpj",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202510/26/2_5/o/y2_10_c6QhaQ1URE_20251026.jpeg"
   }
 }
