@@ -1090,5 +1090,31 @@
     "token": "k4oxy6pf",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202512/15/2_5/o/y2_1pa_010547_20251215141423.jpeg"
+  },
+  "https://www.yad2.co.il/item/ww3c45uv": {
+    "price": 2290000,
+    "rooms": 3,
+    "street": "שער יפו",
+    "neighborhood": "לא ידוע",
+    "city": "ראשון לציון",
+    "floor": 6,
+    "sqm": 85,
+    "phone": "055-4335066",
+    "token": "ww3c45uv",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202601/12/2_5/o/y2_1pa_010490_20260112185616.jpeg"
+  },
+  "https://www.yad2.co.il/item/lr5cncm1": {
+    "price": 2290000,
+    "rooms": 3,
+    "street": "שער יפו",
+    "neighborhood": "נוריות",
+    "city": "ראשון לציון",
+    "floor": 6,
+    "sqm": 85,
+    "phone": null,
+    "token": "lr5cncm1",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202601/12/2_5/o/y2_1pa_010256_20260112185244.jpeg"
   }
 }
