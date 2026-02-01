@@ -1220,5 +1220,18 @@
     "token": "qs6stqt1",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202602/01/2_5/o/y2_1pa_010381_20260201125050.jpeg"
+  },
+  "https://www.yad2.co.il/item/8q988kqn": {
+    "price": 2280000,
+    "rooms": 3,
+    "street": "יעקב בן סירא",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 4,
+    "sqm": 90,
+    "phone": "053-2447866",
+    "token": "8q988kqn",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202512/01/2_5/o/y2_13_992495_20251201.jpg"
   }
 }
