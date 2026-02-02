@@ -1233,5 +1233,18 @@
     "token": "8q988kqn",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202512/01/2_5/o/y2_13_992495_20251201.jpg"
+  },
+  "https://www.yad2.co.il/item/okbjd45l": {
+    "price": 2700000,
+    "rooms": 4,
+    "street": "אורנה פורת",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 5,
+    "sqm": 100,
+    "phone": "055-2130321",
+    "token": "okbjd45l",
+    "is_private": true,
+    "cover_image": null
   }
 }
