@@ -1246,5 +1246,18 @@
     "token": "okbjd45l",
     "is_private": true,
     "cover_image": null
+  },
+  "https://www.yad2.co.il/item/kncmm9je": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "ירושלים",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 80,
+    "phone": "055-4308354",
+    "token": "kncmm9je",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202601/04/2_5/o/y2_5_993613_20260104.jpeg"
   }
 }
