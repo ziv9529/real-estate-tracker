@@ -676,7 +676,7 @@
     "cover_image": null
   },
   "https://www.yad2.co.il/item/txpr11yk": {
-    "price": 2350000,
+    "price": 2330000,
     "rooms": 3,
     "street": "לא ידוע",
     "neighborhood": "נרקיסים",
@@ -686,7 +686,7 @@
     "phone": "055-4363392",
     "token": "txpr11yk",
     "is_private": false,
-    "cover_image": "https://img.yad2.co.il/Pic/202509/20/2_5/o/y2_9_K8ufWrrF00_20250920.jpeg"
+    "cover_image": "https://img.yad2.co.il/Pic/202602/13/2_5/o/y2_8_2UEDvuh4sy_20260213.jpeg"
   },
   "https://www.yad2.co.il/item/926ukemm": {
     "price": 2240000,
@@ -1053,7 +1053,7 @@
     "cover_image": "https://img.yad2.co.il/Pic/202601/05/2_5/o/y2_2_xTWnnTfozX_20260105.jpeg"
   },
   "https://www.yad2.co.il/item/rzik7jvz": {
-    "price": 2270000,
+    "price": 2180000,
     "rooms": 3,
     "street": "לא ידוע",
     "neighborhood": "נרקיסים",
@@ -1324,5 +1324,18 @@
     "token": "f6569rog",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202602/12/2_5/o/y2_1pa_010779_20260212112437.jpeg"
+  },
+  "https://www.yad2.co.il/item/gvki0uix": {
+    "price": 2320000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 5,
+    "sqm": 90,
+    "phone": "055-4363392",
+    "token": "gvki0uix",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202510/19/2_5/o/y2_3__1u3JCZMX__20251019.jpeg"
   }
 }
