@@ -1,6 +1,6 @@
 {
   "https://www.yad2.co.il/item/sk6a8c73": {
-    "price": 2340000,
+    "price": 2280000,
     "rooms": 3,
     "street": "חיים חפר",
     "neighborhood": "הרקפות",
@@ -260,7 +260,7 @@
     "cover_image": "https://img.yad2.co.il/Pic/202508/21/2_5/o/y2_1pa_010638_20250821141256.jpeg"
   },
   "https://www.yad2.co.il/item/13tjiov7": {
-    "price": 2300000,
+    "price": 2350000,
     "rooms": 3,
     "street": "לא ידוע",
     "neighborhood": "נרקיסים",
@@ -299,7 +299,7 @@
     "cover_image": "https://img.yad2.co.il/Pic/202509/03/2_5/o/y2_5_nrFaPV0FrP_20250903.jpg"
   },
   "https://www.yad2.co.il/item/iq13yfen": {
-    "price": 2230000,
+    "price": 2200000,
     "rooms": 3,
     "street": "לא ידוע",
     "neighborhood": "הרקפות",
@@ -325,7 +325,7 @@
     "cover_image": "https://img.yad2.co.il/Pic/202506/26/2_5/o/y2_1pa_010370_20250626181125.jpeg"
   },
   "https://www.yad2.co.il/item/duvn5q5r": {
-    "price": 2595000,
+    "price": 2590000,
     "rooms": 4,
     "street": "אריק איינשטיין",
     "neighborhood": "הרקפות",
@@ -335,7 +335,7 @@
     "phone": "050-7613337",
     "token": "duvn5q5r",
     "is_private": true,
-    "cover_image": "https://img.yad2.co.il/Pic/202512/09/2_1/o/y2_1pa_010571_20251209100809.jpeg"
+    "cover_image": "https://img.yad2.co.il/Pic/202602/09/2_1/o/y2_1_03086_20260209175015.jpeg"
   },
   "https://www.yad2.co.il/item/zr8nsk4i": {
     "price": 2680000,
@@ -390,7 +390,7 @@
     "cover_image": "https://img.yad2.co.il/Pic/202511/09/2_1/o/y2_1pa_010225_20251109215404.jpeg"
   },
   "https://www.yad2.co.il/item/42wn2ues": {
-    "price": 2550000,
+    "price": 2450000,
     "rooms": 4,
     "street": "אורנה פורת",
     "neighborhood": "הרקפות",
@@ -1001,7 +1001,7 @@
     "cover_image": "https://img.yad2.co.il/Pic/202601/01/2_1/o/y2_1pa_010562_20260101221306.jpeg"
   },
   "https://www.yad2.co.il/item/fiatsvpj": {
-    "price": 2300000,
+    "price": 2280000,
     "rooms": 3,
     "street": "לא ידוע",
     "neighborhood": "נרקיסים",
@@ -1040,7 +1040,7 @@
     "cover_image": null
   },
   "https://www.yad2.co.il/item/pjjx3j1j": {
-    "price": 2350000,
+    "price": 2250000,
     "rooms": 3,
     "street": "חיים חפר",
     "neighborhood": "הרקפות",
@@ -1298,5 +1298,31 @@
     "token": "ct587q8v",
     "is_private": true,
     "cover_image": "https://img.yad2.co.il/Pic/202602/06/2_1/o/y2_1pa_010318_20260206153529.jpeg"
+  },
+  "https://www.yad2.co.il/item/4beivhgs": {
+    "price": 2220000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "לא ידוע",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 88,
+    "phone": "055-4525634",
+    "token": "4beivhgs",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202602/12/2_5/o/y2_1pa_010929_20260212142949.jpeg"
+  },
+  "https://www.yad2.co.il/item/f6569rog": {
+    "price": 2330000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 4,
+    "sqm": 88,
+    "phone": null,
+    "token": "f6569rog",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202602/12/2_5/o/y2_1pa_010779_20260212112437.jpeg"
   }
 }
