@@ -1350,5 +1350,18 @@
     "token": "odffybzc",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202602/15/2_5/o/y2_1pa_010636_20260215142757.jpeg"
+  },
+  "https://www.yad2.co.il/item/om8dv114": {
+    "price": 2650000,
+    "rooms": 4,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 10,
+    "sqm": 123,
+    "phone": "055-4367372",
+    "token": "om8dv114",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202602/15/2_5/o/y2_1pa_010483_20260215195040.jpeg"
   }
 }
