@@ -1363,5 +1363,31 @@
     "token": "om8dv114",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202602/15/2_5/o/y2_1pa_010483_20260215195040.jpeg"
+  },
+  "https://www.yad2.co.il/item/csggvco2": {
+    "price": 2000000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 90,
+    "phone": "053-9347368",
+    "token": "csggvco2",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202602/17/2_5/o/y2_1pa_010048_20260217165216.jpeg"
+  },
+  "https://www.yad2.co.il/item/i9bbp9v0": {
+    "price": 2150000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 4,
+    "sqm": 92,
+    "phone": null,
+    "token": "i9bbp9v0",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202602/17/2_5/o/y2_1pa_010482_20260217164947.jpeg"
   }
 }
