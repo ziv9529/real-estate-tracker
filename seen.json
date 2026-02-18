@@ -1402,5 +1402,18 @@
     "token": "fnma2afg",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202503/12/2_5/o/y2_1_992504_20250312.jpg"
+  },
+  "https://www.yad2.co.il/item/g01b6hx8": {
+    "price": 2190000,
+    "rooms": 3,
+    "street": "רבי עקיבא",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 5,
+    "sqm": 82,
+    "phone": "055-4366426",
+    "token": "g01b6hx8",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202602/18/2_5/o/y2_1pa_010927_20260218121948.jpeg"
   }
 }
