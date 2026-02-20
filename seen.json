@@ -1454,5 +1454,18 @@
     "token": "kw8bagd0",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202602/19/2_5/o/y2_1pa_010557_20260219114407.jpeg"
+  },
+  "https://www.yad2.co.il/item/1enc4i9r": {
+    "price": 2170000,
+    "rooms": 3,
+    "street": "החילות",
+    "neighborhood": "נרקיסים",
+    "city": "ראשון לציון",
+    "floor": 2,
+    "sqm": 88,
+    "phone": "055-4368579",
+    "token": "1enc4i9r",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202602/20/2_5/o/y2_1pa_010660_20260220172150.jpeg"
   }
 }
