@@ -1467,5 +1467,18 @@
     "token": "1enc4i9r",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202602/20/2_5/o/y2_1pa_010660_20260220172150.jpeg"
+  },
+  "https://www.yad2.co.il/item/54twonuy": {
+    "price": 2050000,
+    "rooms": 3,
+    "street": "חיים חפר",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 93,
+    "phone": "055-4525358",
+    "token": "54twonuy",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202602/24/2_5/o/y2_1pa_010197_20260224172641.jpeg"
   }
 }
