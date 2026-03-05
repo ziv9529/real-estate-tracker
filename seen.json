@@ -1545,5 +1545,18 @@
     "token": "gyoo0sn0",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202602/17/2_5/o/y2_1pa_991630_20260217110627.jpeg"
+  },
+  "https://www.yad2.co.il/item/2mcfezfu": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "שולמית אלוני",
+    "neighborhood": "נחלת יהודה",
+    "city": "ראשון לציון",
+    "floor": 13,
+    "sqm": 75,
+    "phone": "053-9347368",
+    "token": "2mcfezfu",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202602/12/2_5/o/y2_1pa_010560_20260212135207.jpeg"
   }
 }
