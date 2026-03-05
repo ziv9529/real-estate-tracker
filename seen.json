@@ -1519,5 +1519,31 @@
     "token": "9e6d19ah",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202504/01/2_5/o/y2_8_993197_20250401.jpg"
+  },
+  "https://www.yad2.co.il/item/48v61iib": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "לא ידוע",
+    "neighborhood": "נחלת יהודה",
+    "city": "ראשון לציון",
+    "floor": 12,
+    "sqm": 92,
+    "phone": "053-9347368",
+    "token": "48v61iib",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202603/05/2_5/o/y2_1pa_010687_20260305105249.jpeg"
+  },
+  "https://www.yad2.co.il/item/gyoo0sn0": {
+    "price": 2350000,
+    "rooms": 3,
+    "street": "שולמית אלוני",
+    "neighborhood": "נחלת יהודה",
+    "city": "ראשון לציון",
+    "floor": 12,
+    "sqm": 87,
+    "phone": null,
+    "token": "gyoo0sn0",
+    "is_private": false,
+    "cover_image": "https://img.yad2.co.il/Pic/202602/17/2_5/o/y2_1pa_991630_20260217110627.jpeg"
   }
 }
