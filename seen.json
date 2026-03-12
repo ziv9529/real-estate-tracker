@@ -1584,5 +1584,18 @@
     "token": "zcpdkkcg",
     "is_private": false,
     "cover_image": "https://img.yad2.co.il/Pic/202602/17/2_5/o/y2_1pa_998768_20260217110627.jpeg"
+  },
+  "https://www.yad2.co.il/item/kxrxicjx": {
+    "price": 2655000,
+    "rooms": 4,
+    "street": "אפרים קישון",
+    "neighborhood": "הרקפות",
+    "city": "ראשון לציון",
+    "floor": 3,
+    "sqm": 110,
+    "phone": "055-2128192",
+    "token": "kxrxicjx",
+    "is_private": true,
+    "cover_image": "https://img.yad2.co.il/Pic/202603/12/2_1/o/y2_1pa_010802_20260312112320.jpeg"
   }
 }
