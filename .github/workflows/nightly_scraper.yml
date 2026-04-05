@@ -1,21 +1,19 @@
-name: Yad2 Apartment Scraper (DISABLED)
-
-# DISABLED: This workflow ran every 20 minutes to find new apartments.
-# Replaced by:
-#   nightly_scraper.yml  — scrapes Yad2 + Madlan + OnMap once per night
-#   morning_report.yml   — sends daily Telegram summary at 07:30
-#   weekly_analysis.yml  — Claude AI analysis every Sunday
-# Kept here for reference only.
+name: Nightly Scraper
 
 permissions:
   contents: write
 
 on:
-  # No schedule — disabled. Use workflow_dispatch for manual testing only.
+  # 23:00 Israel Standard Time = 21:00 UTC
+  # 23:00 Israel Summer Time (IDT) = 20:00 UTC
+  # Using 20:00 UTC to cover both seasons
+  schedule:
+    - cron: "0 20 * * *"
+
   workflow_dispatch:
 
 jobs:
-  scraper:
+  scrape:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,9 +21,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
+          fetch-depth: 1
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
@@ -41,11 +39,20 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Yad2 Scraper
+      - name: Install Playwright Chromium
+        run: playwright install chromium --with-deps
+
+      - name: Run Yad2 scraper
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python scripts/scraper_with_alerts.py
+
+      - name: Run Madlan scraper (optional, graceful fail)
+        run: python scripts/madlan_scraper.py || echo "Madlan scraper failed — skipping"
+
+      - name: Run OnMap scraper (optional, graceful fail)
+        run: python scripts/onmap_scraper.py || echo "OnMap scraper failed — skipping"
 
       - name: Commit updated database
         if: always()
@@ -55,5 +62,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add database.db
-          git commit -m "Manual scrape [$(date +'%Y-%m-%d %H:%M:%S')]" || echo "No changes to commit"
+          git commit -m "Nightly scrape [$(date +'%Y-%m-%d %H:%M:%S')]" || echo "No changes to commit"
           git push origin main

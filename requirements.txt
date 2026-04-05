@@ -1,3 +1,6 @@
 aiohttp
 requests
 python-dotenv
+anthropic
+playwright
+playwright-stealth

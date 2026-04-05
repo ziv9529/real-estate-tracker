@@ -1,21 +1,18 @@
-name: Yad2 Apartment Scraper (DISABLED)
-
-# DISABLED: This workflow ran every 20 minutes to find new apartments.
-# Replaced by:
-#   nightly_scraper.yml  — scrapes Yad2 + Madlan + OnMap once per night
-#   morning_report.yml   — sends daily Telegram summary at 07:30
-#   weekly_analysis.yml  — Claude AI analysis every Sunday
-# Kept here for reference only.
+name: Weekly AI Analysis
 
 permissions:
   contents: write
 
 on:
-  # No schedule — disabled. Use workflow_dispatch for manual testing only.
+  # Sunday 07:00 Israel Summer Time = 04:00 UTC
+  # Sunday 07:00 Israel Standard Time = 05:00 UTC
+  schedule:
+    - cron: "0 4 * * 0"
+
   workflow_dispatch:
 
 jobs:
-  scraper:
+  analysis:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,9 +20,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
+          fetch-depth: 1
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
@@ -41,19 +38,23 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Yad2 Scraper
+      - name: Run weekly AI analysis
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python scripts/scraper_with_alerts.py
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/ai_analysis.py
 
-      - name: Commit updated database
+      - name: Rebuild HTML dashboard (with new AI report)
+        run: python scripts/generate_dashboard.py
+
+      - name: Commit updated database and dashboard
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add database.db
-          git commit -m "Manual scrape [$(date +'%Y-%m-%d %H:%M:%S')]" || echo "No changes to commit"
+          git add database.db listings.html listings.csv
+          git commit -m "Weekly AI analysis [$(date +'%Y-%m-%d')]" || echo "No changes to commit"
           git push origin main
