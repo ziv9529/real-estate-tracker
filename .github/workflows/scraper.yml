@@ -5,15 +5,16 @@ permissions:
   contents: write
 
 on:
-  schedule:
-    # Schedule based on Israel Time (UTC+2 standard, UTC+3 daylight)
-    # GitHub Actions runs in UTC, so convert:
-    # 23:00 Israel (standard) = 21:00 UTC
-    - cron: "0 21 * * *"
+  # PAUSED: scheduled runs disabled. Uncomment the block below to resume.
+  # schedule:
+  #   # Schedule based on Israel Time (UTC+2 standard, UTC+3 daylight)
+  #   # GitHub Actions runs in UTC, so convert:
+  #   # 23:00 Israel (standard) = 21:00 UTC
+  #   - cron: "0 21 * * *"
 
-    # 06:00-23:00 Israel every 20 min = 04:00-21:00 UTC (standard) or 03:00-20:00 UTC (daylight)
-    # Using wider window to cover both winter/summer time shifts
-    - cron: "0,20,40 3-21 * * *"
+  #   # 06:00-23:00 Israel every 20 min = 04:00-21:00 UTC (standard) or 03:00-20:00 UTC (daylight)
+  #   # Using wider window to cover both winter/summer time shifts
+  #   - cron: "0,20,40 3-21 * * *"
 
   # Allow manual trigger from GitHub UI
   workflow_dispatch:
